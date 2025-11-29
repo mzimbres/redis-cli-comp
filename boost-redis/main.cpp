@@ -33,7 +33,7 @@ using boost::redis::error;
 using boost::redis::config;
 
 asio::awaitable<void>
-receiver(connection& conn)
+co_receiver(connection& conn)
 {
    flat_tree resp;
    conn.set_receive_response(resp);
@@ -45,7 +45,7 @@ receiver(connection& conn)
 }
 
 asio::awaitable<void>
-session(connection& conn, request const& req)
+co_session(connection& conn, request const& req)
 {
    for (;;)
       co_await conn.async_exec(req);
@@ -61,7 +61,7 @@ void rethrow_on_error(std::exception_ptr p)
 request make_reqs(std::size_t pings, std::string const& msg)
 {
    request req;
-   for (std::size_t i = 0u; i < n_pubs; ++i)
+   for (std::size_t i = 0u; i < pings; ++i)
       req.push("PING", i);
 
    req.push("PUBLISH", "channel", msg);
@@ -75,13 +75,13 @@ co_main()
    asio::io_context ctx;
    connection conn{ctx};
 
-   request const pub_req = make_reqs(10u, 100u);
+   request const session_req = make_reqs(10u, "payload");
 
    // TODO: Use a unix socket.
-   conn.async_run(logger{logger::level::crit}, [](auto) { });
+   conn.async_run({}, [](auto) { });
 
    // Task that consumes the pushes.
-   net::co_spawn(ctx, receiver(conn), rethrow_on_error);
+   asio::co_spawn(ctx, co_receiver(conn), rethrow_on_error);
 
    request sub_req;
    sub_req.push("SUBSCRIBE", "channel");
@@ -90,7 +90,7 @@ co_main()
       // TODO: Check error.
 
       for (std::size_t i = 0u; i < 1u; ++i)
-         net::co_spawn(ctx, session(conn, session_req), rethrow_on_error);
+         asio::co_spawn(ctx, co_session(conn, session_req), rethrow_on_error);
    });
 
    ctx.run();
