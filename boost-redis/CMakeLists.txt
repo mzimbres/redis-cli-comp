@@ -32,7 +32,7 @@ target_compile_features(counter
 
 target_sources(counter
   PRIVATE
-    main.cpp
+    counter.cpp
 )
 
 target_link_libraries(counter

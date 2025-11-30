@@ -10,6 +10,8 @@
 #include <boost/redis/connection.hpp>
 
 #include <boost/asio/co_spawn.hpp>
+#include <boost/asio/consign.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/use_awaitable.hpp>
@@ -51,12 +53,23 @@ co_main()
    co_await conn->async_exec(monitor_req);
 
    flat_tree resp;
-   conn.set_receive_response(resp);
+   conn->set_receive_response(resp);
 
-   for (;;) {
-      co_await conn.async_receive2();
-      resp.clear();
+   int counter = 0;
+   for (;; ++counter) {
+      co_await conn->async_receive2();
+      for (auto const& node: resp.get_view()) {
+         std::cout
+            << "     type: " << node.data_type << "\n"
+            << "agg. size: " << node.aggregate_size << "\n"
+            << "    depth: " << node.depth << "\n"
+            << "    value: " << node.value << "\n"
+            << std::endl;
+         resp.clear();
+      }
    }
+
+   std::cout << "Number of events: " << counter << std::endl;
 }
 
 int main()
