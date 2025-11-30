@@ -18,8 +18,6 @@
 
 #include <iostream>
 
-#include <boost/redis/src.hpp>
-
 // TODO: Use a unix socket.
 
 namespace asio = boost::asio;

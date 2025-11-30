@@ -5,6 +5,19 @@ project(boost-redis-app VERSION "1.0.0" LANGUAGES CXX)
 add_subdirectory(/home/marcelo/Public/boost boost-redis EXCLUDE_FROM_ALL)
 
 #==============================================================================
+add_library(boost_redis_lib STATIC EXCLUDE_FROM_ALL)
+
+target_sources(boost_redis_lib
+  PRIVATE
+    boost_redis_lib.cpp
+)
+
+target_link_libraries(boost_redis_lib
+   PUBLIC
+     Boost::redis
+)
+
+#==============================================================================
 add_executable(boost_redis_app)
 
 target_compile_features(boost_redis_app
@@ -19,23 +32,23 @@ target_sources(boost_redis_app
 
 target_link_libraries(boost_redis_app
   PRIVATE
-    Boost::redis
+    boost_redis_lib
 )
 
 #==============================================================================
-add_executable(counter)
+add_executable(monitor)
 
-target_compile_features(counter
+target_compile_features(monitor
    PRIVATE
       cxx_std_20
 )
 
-target_sources(counter
+target_sources(monitor
   PRIVATE
-    counter.cpp
+    monitor.cpp
 )
 
-target_link_libraries(counter
+target_link_libraries(monitor
   PRIVATE
-    Boost::redis
+    boost_redis_lib
 )
