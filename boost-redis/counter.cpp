@@ -10,8 +10,6 @@
 #include <boost/redis/connection.hpp>
 
 #include <boost/asio/co_spawn.hpp>
-#include <boost/asio/consign.hpp>
-#include <boost/asio/detached.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/use_awaitable.hpp>
@@ -19,8 +17,6 @@
 #include <iostream>
 
 #include <boost/redis/src.hpp>
-
-// TODO: Use a unix socket.
 
 namespace asio = boost::asio;
 using namespace std::chrono_literals;
@@ -36,31 +32,11 @@ using boost::redis::usage;
 using boost::redis::error;
 using boost::redis::config;
 
-asio::awaitable<void>
-co_session(
-   std::shared_ptr<connection> conn,
-   std::shared_ptr<const request> req)
-{
-   for (;;)
-      co_await conn->async_exec(*req);
-}
-
 void rethrow_on_error(std::exception_ptr p)
 {
    if (p) {
       std::rethrow_exception(p);
    }
-}
-
-std::shared_ptr<request>
-make_reqs(std::size_t pings, std::string const& msg)
-{
-   auto req = std::make_shared<request>();
-   for (std::size_t i = 0u; i < pings; ++i)
-      req->push("PING", i);
-
-   req->push("PUBLISH", "channel", msg);
-   return req;
 }
 
 asio::awaitable<void>
@@ -70,19 +46,15 @@ co_main()
    auto conn = std::make_shared<connection>(ex);
    conn->async_run({}, asio::consign(asio::detached, conn));
 
-   request sub_req;
-   sub_req.push("SUBSCRIBE", "channel");
-   co_await conn->async_exec(sub_req);
-
-   auto const session_req = make_reqs(10u, "payload");
-   for (std::size_t i = 0u; i < 1u; ++i)
-      asio::co_spawn(ex, co_session(conn, session_req), rethrow_on_error);
+   request monitor_req;
+   monitor_req.push("MONITOR");
+   co_await conn->async_exec(monitor_req);
 
    flat_tree resp;
-   conn->set_receive_response(resp);
+   conn.set_receive_response(resp);
 
    for (;;) {
-      co_await conn->async_receive2();
+      co_await conn.async_receive2();
       resp.clear();
    }
 }
