@@ -1,9 +1,22 @@
-# redis-cli-comp
+# Redis client comparison
 
-Compare Redis client performance. Metrics we use
+The goal is to compare the performance of different Redis client in
+multiple languages and drivers. The algorith used is
+
+  - Starts `n` concurrent sessions
+  - Subscribe to events from a predefined pubsub channel.
+  - Let each task loop sending the following commands
+
+    - `N` `PING`s
+    -  One `PUBLISH` on the predefined channel.
+  
+  - Read and discard the pushes.
+
+Metrics used to compare the clients
 
   1. Client and server CPU usage. A good client should drive server
-     CPU as high as possible.
+     CPU as high as possible while keeping it own CPU as low as
+     possible.
 
   2. It should be possible for the client to saturate the CPU if it is
      not IO bound.
@@ -11,14 +24,3 @@ Compare Redis client performance. Metrics we use
   3. The more time the client spends executing in the system (as
      opposed to user space) the better.
 
-We compare the app tasks in multiple languages
-
-  - App starts `n` concurrent sessions and subscribes to events from a
-    predefined pubsub channel.
-
-  - Each task loops sending the following commands
-
-    - `a` `PING`s
-    -  One `PUBLISH` on a predefined channel.
-  
-  - Read and discard the pushes.

@@ -18,7 +18,7 @@
 
 #include <iostream>
 
-// TODO: Use a unix socket.
+constexpr char const* channel = "channel";
 
 namespace asio = boost::asio;
 using namespace std::chrono_literals;
@@ -39,6 +39,7 @@ co_session(
    std::shared_ptr<connection> conn,
    std::shared_ptr<const request> req)
 {
+   // TODO: Handle error.
    for (;;)
       co_await conn->async_exec(*req);
 }
@@ -57,23 +58,32 @@ make_reqs(std::size_t pings, std::string const& msg)
    for (std::size_t i = 0u; i < pings; ++i)
       req->push("PING", i);
 
-   req->push("PUBLISH", "channel", msg);
+   req->push("PUBLISH", channel, msg);
    return req;
 }
 
 asio::awaitable<void>
 co_main() 
 {
+   // Parameters
+   auto const pings = 10u;
+   auto const payload_size = 1000u;
+   auto const sessions = 1000u;
+   char const* uds = "/run/redis/redis-server.sock";
+
    auto ex = co_await asio::this_coro::executor;
    auto conn = std::make_shared<connection>(ex);
-   conn->async_run({}, asio::consign(asio::detached, conn));
+   config cfg;
+   cfg.health_check_interval = std::chrono::seconds{0};
+   cfg.unix_socket = uds;
+   conn->async_run(cfg, asio::consign(asio::detached, conn));
 
    request sub_req;
-   sub_req.push("SUBSCRIBE", "channel");
+   sub_req.push("SUBSCRIBE", channel);
    co_await conn->async_exec(sub_req);
 
-   auto const session_req = make_reqs(10u, "payload");
-   for (std::size_t i = 0u; i < 1u; ++i)
+   auto const session_req = make_reqs(pings, std::string(payload_size, 'a'));
+   for (auto i = 0u; i < sessions; ++i)
       asio::co_spawn(ex, co_session(conn, session_req), rethrow_on_error);
 
    flat_tree resp;
@@ -89,6 +99,7 @@ int main()
 {
    try {
 
+      // TODO: Use concurrency hint for single threaded.
       asio::io_context ioc;
       asio::co_spawn(ioc, co_main(), rethrow_on_error);
       ioc.run();
