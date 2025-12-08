@@ -18,7 +18,16 @@
 
 #include <iostream>
 
+// Parameters
 constexpr char const* channel = "channel";
+constexpr char const* payload = "payload";
+constexpr char const* uds = "/run/redis/redis-server.sock";
+constexpr std::size_t pings = 5;
+constexpr std::size_t sessions = 1000;
+constexpr std::size_t repeat = 1000;
+
+// Number of expected events
+constexpr auto expected_events = 1 + sessions * repeat;
 
 namespace asio = boost::asio;
 using namespace std::chrono_literals;
@@ -39,9 +48,9 @@ co_session(
    std::shared_ptr<connection> conn,
    std::shared_ptr<const request> req)
 {
-   // TODO: Handle error.
-   for (;;)
+   for (auto i = 0u; i < repeat; ++i) {
       co_await conn->async_exec(*req);
+   }
 }
 
 void rethrow_on_error(std::exception_ptr p)
@@ -52,25 +61,19 @@ void rethrow_on_error(std::exception_ptr p)
 }
 
 std::shared_ptr<request>
-make_reqs(std::size_t pings, std::string const& msg)
+make_reqs()
 {
    auto req = std::make_shared<request>();
    for (std::size_t i = 0u; i < pings; ++i)
-      req->push("PING", i);
+      req->push("PING");
 
-   req->push("PUBLISH", channel, msg);
+   req->push("PUBLISH", channel, payload);
    return req;
 }
 
 asio::awaitable<void>
 co_main() 
 {
-   // Parameters
-   auto const pings = 10u;
-   auto const payload_size = 1000u;
-   auto const sessions = 1000u;
-   char const* uds = "/run/redis/redis-server.sock";
-
    auto ex = co_await asio::this_coro::executor;
    auto conn = std::make_shared<connection>(ex);
    config cfg;
@@ -82,22 +85,33 @@ co_main()
    sub_req.push("SUBSCRIBE", channel);
    co_await conn->async_exec(sub_req);
 
-   auto const session_req = make_reqs(pings, std::string(payload_size, 'a'));
+   auto const session_req = make_reqs();
    for (auto i = 0u; i < sessions; ++i)
       asio::co_spawn(ex, co_session(conn, session_req), rethrow_on_error);
 
    flat_tree resp;
    conn->set_receive_response(resp);
 
-   for (;;) {
+   // The number of expected events
+   auto n = expected_events;
+   while (n != 0) {
       co_await conn->async_receive2();
+      auto const total_msgs = resp.get_total_msgs();
       resp.clear();
+
+      if (total_msgs > n)
+         throw std::runtime_error("Received more pushes than expected.");
+
+      n -= total_msgs;
    }
+
+   conn->cancel();
 }
 
 int main()
 {
    try {
+      std::cout << "Number of expected events: " << expected_events << "\n";
 
       // TODO: Use concurrency hint for single threaded.
       asio::io_context ioc;

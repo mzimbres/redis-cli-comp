@@ -9,17 +9,30 @@ import (
 
 var ctx = context.Background()
 
-func session(ops redis.Options) {
+// Parameters
+const channel = "channel"
+const payload = "payload"
+const uds = "/run/redis/redis-server.sock"
+const pings = 10
+const sessions = 1000
+const repeat = 1000
 
-	rdb := redis.NewClient(&ops)
+// Number of expected events
+const expected_events = sessions * repeat;
 
+// TODO: Update go and use wg.Go
 
-	for {
+func session(ops *redis.Options) {
+	rdb := redis.NewClient(ops)
+
+	for range repeat {
 		pipe := rdb.Pipeline()
+		for range pings {
+			pipe.Ping(ctx)
+		}
 
-		pipe.Ping(ctx)
-		pipe.Ping(ctx)
-		pipe.Ping(ctx)
+		pipe.Publish(ctx, channel, payload)
+
 		_, err := pipe.Exec(ctx)
 		if err != nil {
 			fmt.Println("ERROR", err)
@@ -30,9 +43,27 @@ func session(ops redis.Options) {
 	rdb.Close()
 }
 
+func subscribe(ops redis.Options) <-chan *redis.Message {
+
+	client := redis.NewClient(&ops)
+	sub := client.Subscribe(ctx, channel)
+
+	// Wait for the message to make sure no message will be lost
+	// when we start to publish in the sessions.
+	iface, err := sub.Receive(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(iface)
+
+	return sub.Channel()
+}
+
 func main() {
-	ops := redis.Options {
-		Addr:     "/run/redis/redis-server.sock",
+	fmt.Println("Number of expected events: ", expected_events)
+	ops := redis.Options{
+		Addr:     uds,
 		Password: "",
 		DB:       0,
 		Protocol: 3,
@@ -40,12 +71,28 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	// TODO: Update go and use wg.Add.
-	for j := 0; j < 10; j++ {
+	ch := subscribe(ops)
+
+	// Pubsub receiver
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		n := 0
+		for range ch {
+			//fmt.Println(msg.Channel, msg.Payload)
+			n++
+			if (n == expected_events) {
+				break
+			}
+		}
+	}()
+
+	// Sessions
+	for j := 0; j < sessions; j++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			session(ops)
+			session(&ops)
 		}()
 	}
 
