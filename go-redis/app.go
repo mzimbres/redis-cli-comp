@@ -7,20 +7,18 @@ import (
     "sync"
 )
 
-var ctx = context.Background()
-
 // Parameters
 const channel = "channel"
 const payload = "payload"
 const uds = "/run/redis/redis-server.sock"
-const pings = 10
+const pings = 5
 const sessions = 1000
-const repeat = 1000
+const repeat = 5000
 
 // Number of expected events
 const expected_events = sessions * repeat;
 
-// TODO: Update go and use wg.Go
+var ctx = context.Background()
 
 func session(ops *redis.Options) {
 	rdb := redis.NewClient(ops)
@@ -60,8 +58,15 @@ func subscribe(ops redis.Options) <-chan *redis.Message {
 	return sub.Channel()
 }
 
+func receive(ch <-chan *redis.Message) {
+	for i := 0; i < expected_events; i++ {
+		<-ch
+	}
+}
+
 func main() {
-	fmt.Println("Number of expected events: ", expected_events)
+	fmt.Println("Number of events expected: ", expected_events)
+
 	ops := redis.Options{
 		Addr:     uds,
 		Password: "",
@@ -73,21 +78,14 @@ func main() {
 
 	ch := subscribe(ops)
 
-	// Pubsub receiver
+	// Spawn the pubsub receiver
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		n := 0
-		for range ch {
-			//fmt.Println(msg.Channel, msg.Payload)
-			n++
-			if (n == expected_events) {
-				break
-			}
-		}
+		receive(ch)
 	}()
 
-	// Sessions
+	// Spawn the sessions
 	for j := 0; j < sessions; j++ {
 		wg.Add(1)
 		go func() {

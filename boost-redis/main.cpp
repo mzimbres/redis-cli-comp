@@ -24,7 +24,7 @@ constexpr char const* payload = "payload";
 constexpr char const* uds = "/run/redis/redis-server.sock";
 constexpr std::size_t pings = 5;
 constexpr std::size_t sessions = 1000;
-constexpr std::size_t repeat = 1000;
+constexpr std::size_t repeat = 5000;
 
 // Number of expected events
 constexpr auto expected_events = 1 + sessions * repeat;
@@ -111,7 +111,7 @@ co_main()
 int main()
 {
    try {
-      std::cout << "Number of expected events: " << expected_events << "\n";
+      std::cout << "Number of events expected: " << expected_events << "\n";
 
       // TODO: Use concurrency hint for single threaded.
       asio::io_context ioc;

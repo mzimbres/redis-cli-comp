@@ -48,4 +48,12 @@ to watch closely though
 
 TODO: Time to compile, number of lines of code.
 
+## Results
+
+time | go-redis | boost-redis
+-----|----------|------------
+real |  61.071s | 10.286s
+user | 107.398s |  9.110s 
+sys	 |  49.892s |  0.578s 
+
 [1]  On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.
