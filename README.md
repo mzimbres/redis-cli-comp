@@ -50,14 +50,15 @@ TODO: Time to compile, number of lines of code.
 
 ## Results
 
-time | go-redis | boost-redis | rueidis
------|----------|-------------|---------
-real | 121.212s |   20.813s   |  55.562s
-user | 215.867s |   18.134s   | 132.746s
-sys	 | 102.258s |    1.060s   |  34.274s
-
-
-
+time (s)    | real    | user    | sys
+------------|---------|---------|-------
+boost-redis |  20.813 |  18.134 |   1.060
+go-redis    | 121.212 | 215.867 | 102.258
+rueidiss    |  55.562 | 132.746 |  34.274
 
 
 [1] On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.
+
+```sh
+awk 'NR==1 { min=$2 } FNR==NR{min=($2+0<min)?$2:min;next} {print $1,$2/min}' foo.txt foo.txt
+```
