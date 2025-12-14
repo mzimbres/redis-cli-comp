@@ -51,9 +51,13 @@ TODO: Time to compile, number of lines of code.
 ## Results
 
 time | go-redis | boost-redis | rueidis
------|----------|-------------|--------
-real |  61.071s |   10.286s   | 25.723s
-user | 107.398s |    9.110s   | 61.748s
-sys	 |  49.892s |    0.578s   | 15.633s
+-----|----------|-------------|---------
+real | 121.212s |   20.813s   |  55.562s
+user | 215.867s |   18.134s   | 132.746s
+sys	 | 102.258s |    1.060s   |  34.274s
+
+
+
+
 
 [1] On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.

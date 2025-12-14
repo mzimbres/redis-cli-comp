@@ -13,7 +13,7 @@ const payload = "payload"
 const uds = "/run/redis/redis-server.sock"
 const pings = 5
 const sessions = 1000
-const repeat = 5000
+const repeat = 10000
 
 // Number of expected events
 const expected_events = sessions * repeat;
