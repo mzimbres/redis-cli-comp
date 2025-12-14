@@ -26,8 +26,11 @@ constexpr std::size_t pings = 5;
 constexpr std::size_t sessions = 1000;
 constexpr std::size_t repeat = 10000;
 
-// Number of expected events
-constexpr auto expected_events = 1 + sessions * repeat;
+// Number of events expected 
+constexpr auto expected_pushes = 1 + sessions * repeat;
+
+// Number of responses expected 
+constexpr auto expected_resps = sessions * pings;
 
 namespace asio = boost::asio;
 using namespace std::chrono_literals;
@@ -76,9 +79,13 @@ co_main()
 {
    auto ex = co_await asio::this_coro::executor;
    auto conn = std::make_shared<connection>(ex);
+
    config cfg;
    cfg.health_check_interval = std::chrono::seconds{0};
    cfg.unix_socket = uds;
+
+   flat_tree resp;
+   conn->set_receive_response(resp);
    conn->async_run(cfg, asio::consign(asio::detached, conn));
 
    request sub_req;
@@ -89,20 +96,13 @@ co_main()
    for (auto i = 0u; i < sessions; ++i)
       asio::co_spawn(ex, co_session(conn, session_req), rethrow_on_error);
 
-   flat_tree resp;
-   conn->set_receive_response(resp);
-
    // The number of expected events
-   auto n = expected_events;
-   while (n != 0) {
+   auto n = 0u;
+   while (n < expected_pushes) {
       co_await conn->async_receive2();
       auto const total_msgs = resp.get_total_msgs();
+      n += total_msgs;
       resp.clear();
-
-      if (total_msgs > n)
-         throw std::runtime_error("Received more pushes than expected.");
-
-      n -= total_msgs;
    }
 
    conn->cancel();
@@ -111,7 +111,13 @@ co_main()
 int main()
 {
    try {
-      std::cout << "Number of events expected: " << expected_events << "\n";
+      std::cout
+         << "Expects:\n"
+         << "  - Responses: " << expected_resps << "\n"
+         << "  - Pushes: " << expected_pushes << "\n"
+         << "  - Total: " << (expected_resps + expected_pushes) << "\n"
+         << std::endl
+      ;
 
       asio::io_context ioc{BOOST_ASIO_CONCURRENCY_HINT_UNSAFE};
       asio::co_spawn(ioc, co_main(), rethrow_on_error);
