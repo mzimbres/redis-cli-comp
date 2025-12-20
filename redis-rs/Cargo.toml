@@ -1,8 +1,9 @@
 [package]
-name = "redis-rs"
-version = "0.1.0"
+name = "app"
+version = "0.0.1"
 edition = "2024"
 
 [dependencies]
+futures = "0.3"
 tokio = { version = "1.32.0", features = ["full"] }
-redis = { version = "0.32.5", features = ["tokio-comp"] }
+redis = { version = "*", features = ["tokio-comp"] }

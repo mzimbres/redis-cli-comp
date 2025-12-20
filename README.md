@@ -3,7 +3,7 @@
 The goal of this project is to compare the performance of Redis
 clients in multiple languages. Although there is no single benchmark
 that represents best all use cases a large subset of client usage are
-internet facing (HTTP) servers that has multiple user connections.
+internet facing (HTTP) servers that have multiple user connections.
 
 Server sent pushes is another feature that clients have to deal with
 e.g. when Redis is used as message broken pubsub and multiple other
@@ -46,7 +46,10 @@ to watch closely though
 
   - TODO: Talk about multiplexing and pipelining.
 
-TODO: Time to compile, number of lines of code.
+## TODO
+
+  - Compare time to compile and number of lines of code.
+  - Test redigo.
 
 ## Results
 
