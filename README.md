@@ -58,7 +58,7 @@ time (s)    | real    | user    | sys
 boost-redis |  20.813 |  18.134 |   1.060
 go-redis    | 121.212 | 215.867 | 102.258
 rueidiss    |  55.562 | 132.746 |  34.274
-
+redis-rs    |  82.986 | 290.861 |  41.862
 
 [1] On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.
 

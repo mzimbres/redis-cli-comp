@@ -1,32 +1,46 @@
-use futures::prelude::*;
 use redis::{aio::MultiplexedConnection, RedisResult};
 
-//const PINGS: i64 = 5;
+const CHANNEL: &str = "channel";
+const PAYLOAD: &str = "payload";
+const PINGS: i64 = 5;
 const SESSIONS: usize = 1000;
+const REPEAT: usize = 10000;
 
-async fn session(con: &MultiplexedConnection) -> RedisResult<()> {
-    let mut con = con.clone();
+// Number of events expected 
+const EXPECTED_PUSHES: usize = 1 + SESSIONS * REPEAT;
 
-    for _i in 1..SESSIONS {
-        redis::cmd("PING").exec_async(&mut con).await?;
-        redis::cmd("PING").exec_async(&mut con).await?;
-        redis::cmd("PING").exec_async(&mut con).await?;
-        redis::cmd("PING").exec_async(&mut con).await?;
-        redis::cmd("PING").exec_async(&mut con).await?
+async fn session(mut con: MultiplexedConnection) -> RedisResult<()> {
+
+    for _i in 0..REPEAT {
+        for _j in 0..PINGS {
+            redis::cmd("PING").exec_async(&mut con).await?;
+        }
+
+        redis::cmd("PUBLISH")
+            .arg(CHANNEL)
+            .arg(PAYLOAD)
+            .exec_async(&mut con).await?;
     }
 
-    // TODO: Remove this
-    redis::cmd("PING").exec_async(&mut con).await
+    Ok(())
 }
 
 #[tokio::main]
 async fn main() {
-    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
+    let client = redis::Client::open("redis://127.0.0.1/?protocol=resp3").unwrap();
 
     let con = client.get_multiplexed_async_connection().await.unwrap();
 
-    let cmds = (1..SESSIONS).map(|_i| session(&con));
-    let result = future::try_join_all(cmds).await.unwrap();
+    for _i in 0..SESSIONS {
+        tokio::spawn(session(con.clone()));
+    }
 
-    assert_eq!(SESSIONS, result.len());
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
+    let config = redis::AsyncConnectionConfig::new().set_push_sender(tx);
+    let mut con = client.get_multiplexed_async_connection_with_config(&config).await.unwrap();
+    con.subscribe(CHANNEL).await.unwrap();
+    
+    for _i in 0..EXPECTED_PUSHES {
+        let _ = rx.recv().await.unwrap();
+    }
 }
