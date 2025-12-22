@@ -60,6 +60,17 @@ go-redis    | 121.212 | 215.867 | 102.258
 rueidis     |  55.562 | 132.746 |  34.274
 redis-rs    |  95.135 | 187.079 |  66.864
 
+Popularity  | Stars   | UIA     | Age   | Birth   
+------------|---------|---------|-------|---------
+boost-redis |     270 |      64 |     6 | Nov 2019
+go-redis    |   21800 |    1090 |    13 | Jul 2012
+rueidis     |    2900 |     174 |     5 | Sep 2021
+redis-rs    |    4100 |     495 |    12 | Dec 2013
+redis++     |    1900 |     327 |     8 | Dec 2017
+
+UIA: Number of unique issue authors.
+
+
 [1] On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.
 
 ```sh
