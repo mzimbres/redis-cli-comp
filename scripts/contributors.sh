@@ -1,7 +1,7 @@
 #!/bin/bash
 
 root="/home/marcelo/Public"
-paths="boost/libs/redis go-redis rueidis redis-rs redis-plus-plus"
+paths="boost/libs/redis go-redis rueidis redis-rs redis-plus-plus fred-rs"
 
 #for path in $paths; do
 #   echo $path

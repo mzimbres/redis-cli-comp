@@ -71,11 +71,8 @@ go-redis    |   21800 |    1090 |          400 |    13 | Jul 2012
 rueidis     |    2900 |     174 |          132 |     5 | Sep 2021
 redis-rs    |    4100 |     495 |          261 |    12 | Dec 2013
 redis++     |    1900 |     327 |           44 |     8 | Dec 2017
+fred-rs     |     505 |      94 |            1 |     4 | Aug 2021
 
 UIA: Number of unique issue authors.
 
 [1] On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.
-
-```sh
-awk 'NR==1 { min=$2 } FNR==NR{min=($2+0<min)?$2:min;next} {print $1,$2/min}' foo.txt foo.txt
-```
