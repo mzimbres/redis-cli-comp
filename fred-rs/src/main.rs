@@ -2,31 +2,61 @@
 #![allow(clippy::let_underscore_future)]
 
 use fred::prelude::*;
+//use std::time::Duration;
+//use tokio::time::sleep;
+
+const CHANNEL: &str = "channel";
+const PAYLOAD: &str = "payload";
+const POOL_SIZE: usize = 256;
+const PINGS: usize = 5;
+const SESSIONS: usize = 1000;
+const REPEAT: usize = 1000;
+
+// Number of events expected 
+const EXPECTED_PUSHES: usize = SESSIONS * REPEAT;
+
+async fn session(pool: Pool) -> Result<(), fred::error::Error> {
+    for _i in 0..REPEAT {
+        let client = pool.next();
+        let pipe = client.pipeline();
+        for _j in 0..PINGS {
+            let _: () = pipe.ping(None).await?;
+        }
+        let _: () = pipe.publish(CHANNEL, PAYLOAD).await?;
+        let _: () = pipe.all().await?;
+    }
+
+    Ok(())
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-  let pool = Builder::default_centralized().build_pool(5)?;
-  pool.init().await?;
+    // ====================================================
+    // Separate connection for the subscriber.
+    let sub = Builder::default_centralized()
+    .with_performance_config(|config| {
+        config.broadcast_channel_capacity = 256;
+    })
+    .build()?;
+    sub.init().await?;
+    let _ = sub.subscribe(CHANNEL).await?;
 
-  // all client types, including `RedisPool`, implement the same
-  // command interface traits so callers can often use them
-  // interchangeably. in this example each command below will be sent
-  // round-robin to the underlying 5 clients.
-  assert!(pool.get::<Option<String>, _>("foo").await?.is_none());
-  let _: () = pool.set("foo", "bar", None, None, false).await?;
-  assert_eq!(pool.get::<String, _>("foo").await?, "bar");
+    // ====================================================
+    let pool = Builder::default_centralized().build_pool(POOL_SIZE)?;
+    pool.init().await?;
+    for _i in 0..SESSIONS {
+        tokio::spawn(session(pool.clone()));
+    }
 
-  let _: () = pool.del("foo").await?;
-  // interact with specific clients via next(), last(), or clients()
-  let pipeline = pool.next().pipeline();
-  let _: () = pipeline.incr("foo").await?;
-  let _: () = pipeline.incr("foo").await?;
-  assert_eq!(pipeline.last::<i64>().await?, 2);
+    // ====================================================
+    // Loop receiving events.
+    let mut rx = sub.message_rx();
+    let mut n: usize = 0;
+    while n < EXPECTED_PUSHES {
+        let _ = rx.recv().await;
+        n += 1;
+        println!("finish {}/{}", n, EXPECTED_PUSHES);
+    }
 
-  for client in pool.clients() {
-    println!("{} connected to {:?}", client.id(), client.active_connections());
-  }
-
-  pool.quit().await?;
-  Ok(())
+    Ok(())
 }
