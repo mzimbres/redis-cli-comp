@@ -55,12 +55,12 @@ to watch closely though
 
 ### Performance, resource usage
 
-time (s)    | real    | user    | sys
-------------|---------|---------|-------
-boost-redis |  20.813 |  18.134 |   1.060
-go-redis    | 121.212 | 215.867 | 102.258
-rueidis     |  55.562 | 132.746 |  34.274
-redis-rs    |  95.135 | 187.079 |  66.864
+client      | real(s) | user(s) | sys(s) | CPU(%)
+------------|---------|---------|--------|-------
+boost-redis |  31.74  |   23.48 |   1.32 |    78%
+go-redis    | 114.31  |  218.65 | 103.64 |   281%
+rueidis     |  66.07  |  145.36 |  38.73 |   278%
+redis-rs    | 103.66  |  217.51 |  76.16 |   283%
 
 ### Popularity
 
@@ -80,6 +80,4 @@ UIA: Number of unique issue authors.
 ## TODO
 
   - Fred bug report: It does not receive all events.
-  - Boost-Redis bug report: Concurrency hint unsafe is incompatible
-    with `async_resolve`.
 

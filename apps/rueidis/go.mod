@@ -1,4 +1,4 @@
-module example.com/rueidis-app
+module example.com/app
 
 go 1.24.9
 
