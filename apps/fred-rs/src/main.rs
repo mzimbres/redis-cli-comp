@@ -1,9 +1,4 @@
-#![allow(clippy::disallowed_names)]
-#![allow(clippy::let_underscore_future)]
-
 use fred::prelude::*;
-//use std::time::Duration;
-//use tokio::time::sleep;
 
 const CHANNEL: &str = "channel";
 const PAYLOAD: &str = "payload";
@@ -39,9 +34,12 @@ async fn main() -> Result<(), Error> {
     })
     .build()?;
     sub.init().await?;
+
+    // Subscribe before starting to publish.
     let _ = sub.subscribe(CHANNEL).await?;
 
     // ====================================================
+    // Spawn publisher tasks.
     let pool = Builder::default_centralized().build_pool(POOL_SIZE)?;
     pool.init().await?;
     for _i in 0..SESSIONS {
