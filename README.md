@@ -1,27 +1,33 @@
 # Redis client comparison
 
-Redis main selling point is performance. As an _in-memory_ database it
-promises a low-latency solution for typical backend needs: caching,
-queuing, rate limiting etc.
+The most important Redis selling point is performance. As an
+_in-memory_ database it promises a low-latency solution for typical
+backend needs: caching, queuing, rate limiting etc.
 
-The Redis server however is only one side of the equation. To achieve
-full speed up the clients on the other end must be able to push the
-Redis server to its limits. To assess the performance of Redis clients
-we first have to come up with a meaningful benchmark.
-
-## Benchmark
+The Redis server however is only one side of the equation. It does not
+matter how fast Redis reacts to a request if the clients on other end
+cannot make proper use of that performance and push the server to its
+limits. To assess the performance profile of Redis clients we need a
+benchmark that is representative of how Redis is used in production
+environment.
 
 It is safe to say that the majority of apps using Redis are internet
-facing servers (mostly HTTP) that serve multiple connections and
-perhaps receive some form of pubsub events. It is not hard to
-translate this observation into a simple benchmark app. In this
-assessment we have used the following
+facing servers (mostly HTTP) that serve connections concurrently while
+perhaps receiving some form of pubsub events, for example
 
   1. Start multiple sessions that loop sending multiple `PING`s and
      one `PUBLISH` command.
 
   2. Subscribe to the channel where messages are published in 1. and
      consume them.
+
+where
+
+  - sessions above refer to coroutine (c++), goroutine (go), tasks (rust).
+
+  - The specific commands sent by each session is not important for
+    the purpose of the benchmark. `PING` commands good choice here
+    because they are lightweight for both the server and client.
 
 ## Clients tested
 
@@ -37,6 +43,7 @@ rueidis     |    2900 |     174 |          132 |     5 | Sep 2021
 redis-rs    |    4100 |     495 |          261 |    12 | Dec 2013
 redis++     |    1900 |     327 |           44 |     8 | Dec 2017
 fred-rs     |     505 |      94 |            1 |     4 | Aug 2021
+redigo      |    9900 |     375 |           80 |    13 | Apr 2012
 
 ## Results
 
@@ -53,7 +60,7 @@ where UIA is the number of unique issue authors of the respective
 repository. For comparison purposes it is also useful to look at the
 normalied values
 
-client      | real(s) | user(s) | sys(s) | CPU(%)
+client      | real    | user    | sys    | CPU   
 ------------|---------|---------|--------|-------
 boost-redis |   1.000 |   1.000 |  1.000 | 1.000
 rueidis     |   2.082 |   6.191 | 29.341 | 3.564
