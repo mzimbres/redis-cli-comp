@@ -1,68 +1,33 @@
 # Redis client comparison
 
-The goal of this project is to compare the performance of Redis
-clients in multiple languages. Although there is no single benchmark
-that represents best all use cases a large subset of client usage are
-internet facing (HTTP) servers that have multiple user connections.
+Redis main selling point is performance. As an _in-memory_ database it
+promises a low-latency solution for typical backend needs: caching,
+queuing, rate limiting etc.
 
-Server sent pushes is another feature that clients have to deal with
-e.g. when Redis is used as message broken pubsub and multiple other
-forms of pushes.
+The Redis server however is only one side of the equation. To achieve
+full speed up the clients on the other end must be able to push the
+Redis server to its limits. To assess the performance of Redis clients
+we first have to come up with a meaningful benchmark.
 
-We have used this as a base to define a task to be implemented by each
-client. The benchamark app will implement the following
+## Benchmark
 
-  1. Start multiple independent sessions that loop sending `PING`s and one `PUBLISH` command.
+It is safe to say that the majority of apps using Redis are internet
+facing servers (mostly HTTP) that serve multiple connections and
+perhaps receive some form of pubsub events. It is not hard to
+translate this observation into a simple benchmark app. In this
+assessment we have used the following
 
-  2. Subscribe to the channel where messages are published and consume them
+  1. Start multiple sessions that loop sending multiple `PING`s and
+     one `PUBLISH` command.
 
-In 1. we use the PING command because it is very low weight for the
-server i.e. we want to benchmark clients and not the server.
+  2. Subscribe to the channel where messages are published in 1. and
+     consume them.
 
-## Metrics
+## Clients tested
 
-The time spent to execute the task is the best single number we can
-come up with to compare clients. There are however some things we have
-to watch closely though
-
-  - We should make sure that the setup is not IO bound otherwise the
-    numbers won't convey information useful for comparison. This can
-    be avoided by communicating through a fast link such as a Unix
-    Socket [1]. This will help reducing the time the process spends in
-    kernel space which is common to all apps since they are expected
-    to communicated the exact some data.
-
-  - If a client cannot saturate the CPU it might be because the Redis
-    server is saturated. When two clients need the same amount of time
-    to execute the task, the one with the lowest CPU usage is obviously
-    the most efficient.
-
-  - It should be possible to saturate the CPU when the setup is
-    neither IO bound nor the Server is saturated. A client that fails
-    to do that has some form of contention which is a bad thing for
-    performance. Given the server only performs light weight
-    operations it is expected that the client will saturate the CPU
-    before the server.
-
-  - TODO: Talk about multiplexing and pipelining.
-
-## TODO
-
-  - Compare time to compile and number of lines of code.
-  - Test redigo.
-
-## Results
-
-### Performance, resource usage
-
-client      | real(s) | user(s) | sys(s) | CPU(%)
-------------|---------|---------|--------|-------
-boost-redis |  31.74  |   23.48 |   1.32 |    78%
-go-redis    | 114.31  |  218.65 | 103.64 |   281%
-rueidis     |  66.07  |  145.36 |  38.73 |   278%
-redis-rs    | 103.66  |  217.51 |  76.16 |   283%
-
-### Popularity
+The benchmark laid out above was implement in the most popular C++, Go
+and Rust clients. The table below provides provides useful metrics
+about the popularity of each cleint
 
 Popularity  | Stars   | UIA     | Contributors | Age   | Birth   
 ------------|---------|---------|--------------|-------|---------
@@ -73,11 +38,37 @@ redis-rs    |    4100 |     495 |          261 |    12 | Dec 2013
 redis++     |    1900 |     327 |           44 |     8 | Dec 2017
 fred-rs     |     505 |      94 |            1 |     4 | Aug 2021
 
-UIA: Number of unique issue authors.
+## Results
 
-[1] On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.
+The raw results data is summarised below
+
+client      | real(s) | user(s) | sys(s) | CPU(%)
+------------|---------|---------|--------|-------
+boost-redis |  31.74  |   23.48 |   1.32 |    78%
+rueidis     |  66.07  |  145.36 |  38.73 |   278%
+redis-rs    | 103.66  |  217.51 |  76.16 |   283%
+go-redis    | 114.31  |  218.65 | 103.64 |   281%
+
+where UIA is the number of unique issue authors of the respective
+repository. For comparison purposes it is also useful to look at the
+normalied values
+
+client      | real(s) | user(s) | sys(s) | CPU(%)
+------------|---------|---------|--------|-------
+boost-redis |   1.000 |   1.000 |  1.000 | 1.000
+rueidis     |   2.082 |   6.191 | 29.341 | 3.564
+redis-rs    |   3.266 |   9.264 | 57.697 | 3.628
+go-redis    |   3.601 |   9.312 | 78.515 | 3.603
+
+## Conclusion
+
+The intrinsic performance difference of the languages used to implemet
+the clients cannot account for the performance differece in the
+benchmarks. The differences is mostly due to design problems.
 
 ## TODO
 
+  - Compare time to compile and number of lines of code.
   - Fred bug report: It does not receive all events.
+  - Test redigo.
 
