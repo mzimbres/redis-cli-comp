@@ -76,3 +76,10 @@ fred-rs     |     505 |      94 |            1 |     4 | Aug 2021
 UIA: Number of unique issue authors.
 
 [1] On the system I tested has a thoughput of 5Gb/s TODO: Write a bash script that shows that.
+
+## TODO
+
+  - Fred bug report: It does not receive all events.
+  - Boost-Redis bug report: Concurrency hint unsafe is incompatible
+    with `async_resolve`.
+
