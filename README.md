@@ -47,7 +47,18 @@ redigo      |    9900 |     375 |           80 |    13 | Apr 2012
 
 ## Results
 
-The raw results data is summarised below
+System throughput
+
+Type                    | Bytes
+------------------------|----------
+Commands sent           |    60.000.002
+Bytes sent              | 1.130.000.085
+Responses received      |    60.000.001
+Pushes received         |    10.000.001
+Response-bytes received |   390.000.220
+Push-bytes received     |   430.000.036
+
+Performance
 
 client      | real(s) | user(s) | sys(s) | CPU(%)
 ------------|---------|---------|--------|-------
@@ -57,7 +68,11 @@ redis-rs    | 103.66  |  217.51 |  76.16 |   283%
 go-redis    | 114.31  |  218.65 | 103.64 |   281%
 
 where UIA is the number of unique issue authors of the respective
-repository. For comparison purposes it is also useful to look at the
+repository.
+
+Performance (normalized)
+
+For comparison purposes it is also useful to look at the
 normalied values
 
 client      | real    | user    | sys    | CPU   

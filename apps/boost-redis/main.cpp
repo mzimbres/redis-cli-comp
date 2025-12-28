@@ -45,6 +45,21 @@ using boost::redis::connection;
 using boost::redis::usage;
 using boost::redis::error;
 using boost::redis::config;
+using boost::redis::usage;
+
+std::ostream& operator<<(std::ostream& os, usage const& usg)
+{
+   os << "Number of commands sent: "                     << usg.commands_sent << "\n"
+      << "Number of bytes sent: "                        << usg.bytes_sent << "\n"
+      << "Number of responses received: "                << usg.responses_received << "\n"
+      << "Number of pushes received: "                   << usg.pushes_received << "\n"
+      << "Number of response-bytes received: "           << usg.response_bytes_received << "\n"
+      << "Number of push-bytes received: "               << usg.push_bytes_received << "\n"
+      << "Number of bytes rotated in the read buffer: "  << usg.bytes_rotated << "\n"
+   ;
+
+   return os;
+}
 
 asio::awaitable<void>
 co_session(
@@ -63,8 +78,7 @@ void rethrow_on_error(std::exception_ptr p)
    }
 }
 
-std::shared_ptr<request>
-make_reqs()
+std::shared_ptr<request> make_reqs()
 {
    auto req = std::make_shared<request>();
    for (std::size_t i = 0u; i < pings; ++i)
@@ -74,18 +88,12 @@ make_reqs()
    return req;
 }
 
-asio::awaitable<void>
-co_main() 
+asio::awaitable<void> co_main(config cfg)
 {
    auto ex = co_await asio::this_coro::executor;
    auto conn = std::make_shared<connection>(ex);
 
-   config cfg;
-   cfg.health_check_interval = std::chrono::seconds{0};
    cfg.unix_socket = uds;
-
-   flat_tree resp;
-   conn->set_receive_response(resp);
    conn->async_run(cfg, asio::consign(asio::detached, conn));
 
    request sub_req;
@@ -96,31 +104,24 @@ co_main()
    for (auto i = 0u; i < sessions; ++i)
       asio::co_spawn(ex, co_session(conn, session_req), rethrow_on_error);
 
-   // The number of expected events
-   auto n = 0u;
-   while (n < expected_pushes) {
+   while (conn->get_usage().pushes_received < expected_pushes) {
       co_await conn->async_receive2();
-      auto const total_msgs = resp.get_total_msgs();
-      n += total_msgs;
-      resp.clear();
    }
 
    conn->cancel();
+
+   std::cout
+      << "Usage data\n"
+      << conn->get_usage()
+      << std::endl;
 }
 
 int main()
 {
    try {
-      std::cout
-         << "Expects:\n"
-         << "  - Responses: " << expected_resps << "\n"
-         << "  - Pushes: " << expected_pushes << "\n"
-         << "  - Total: " << (expected_resps + expected_pushes) << "\n"
-         << std::endl
-      ;
-
+      config cfg;
       asio::io_context ioc{BOOST_ASIO_CONCURRENCY_HINT_UNSAFE};
-      asio::co_spawn(ioc, co_main(), rethrow_on_error);
+      asio::co_spawn(ioc, co_main(cfg), rethrow_on_error);
       ioc.run();
 
    } catch (std::exception const& e) {
