@@ -45,12 +45,15 @@ redis++     |    1900 |     327 |           44 |     8 | Dec 2017
 fred-rs     |     505 |      94 |            1 |     4 | Aug 2021
 redigo      |    9900 |     375 |           80 |    13 | Apr 2012
 
+where UIA is the number of unique issue authors in the respective
+repository.
+
 ## Results
 
 System throughput
 
 Type                    | Bytes
-------------------------|----------
+------------------------|--------------
 Commands sent           |    60.000.002
 Bytes sent              | 1.130.000.085
 Responses received      |    60.000.001
@@ -67,13 +70,7 @@ rueidis     |  66.07  |  145.36 |  38.73 |   278%
 redis-rs    | 103.66  |  217.51 |  76.16 |   283%
 go-redis    | 114.31  |  218.65 | 103.64 |   281%
 
-where UIA is the number of unique issue authors of the respective
-repository.
-
 Performance (normalized)
-
-For comparison purposes it is also useful to look at the
-normalied values
 
 client      | real    | user    | sys    | CPU   
 ------------|---------|---------|--------|-------
