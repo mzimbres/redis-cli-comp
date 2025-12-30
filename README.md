@@ -78,8 +78,6 @@ push.
 
 ## Results
 
-### Performance
-
 client      | real(s) | user(s) | sys(s) | CPU(%)
 ------------|---------|---------|--------|-------
 boost-redis |  31.74  |   23.48 |   1.32 |    78%
@@ -100,6 +98,5 @@ go-redis    |   3.601 |   9.312 | 78.515 | 3.603
 
 The intrinsic performance difference of the languages used
 to implement the clients cannot account for the performance
-differece in the benchmarks. The differences is mostly due
-to design problems.
+differece in the benchmarks.
 
