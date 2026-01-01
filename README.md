@@ -100,3 +100,11 @@ The intrinsic performance difference of the languages used
 to implement the clients cannot account for the performance
 differece in the benchmarks.
 
+## TODO
+
+  - pidstat -w
+  - pidstat -v
+  - pidstat -u
+  - perf stat
+  - strace
+  - Article about how buffer rotations affect performance.

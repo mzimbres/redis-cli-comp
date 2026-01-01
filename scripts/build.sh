@@ -38,19 +38,31 @@ echo "========================================================="
 echo "boost-redis"
 cd $root/tmp
 /usr/bin/time --format="$format" ./app
+pidstat -v 1 -e ./app
+pidstat -u 1 -e ./app
+pidstat -w 1 -e ./app
 
 echo "========================================================="
 echo "go-redis"
 cd $apps_dir/go-redis
 /usr/bin/time --format="$format" ./app
+pidstat -v 1 -e ./app
+pidstat -u 1 -e ./app
+pidstat -w 1 -e ./app
 
 echo "========================================================="
 echo "rueidis"
 cd $apps_dir/rueidis
 /usr/bin/time --format="$format" ./app
+pidstat -v 1 -e ./app
+pidstat -u 1 -e ./app
+pidstat -w 1 -e ./app
 
 echo "========================================================="
 echo "redis-rs"
 cd $apps_dir/redis-rs/target/release
 /usr/bin/time --format="$format" ./app
+pidstat -v 1 -e ./app
+pidstat -u 1 -e ./app
+pidstat -w 1 -e ./app
 
