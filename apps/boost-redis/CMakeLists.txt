@@ -18,22 +18,24 @@ target_link_libraries(boost_redis_lib
 )
 
 #==============================================================================
-add_executable(app)
+add_executable(app_boost_redis)
 
-target_compile_features(app
+target_compile_features(app_boost_redis
    PRIVATE
       cxx_std_20
 )
 
-target_sources(app
+target_sources(app_boost_redis
   PRIVATE
     main.cpp
 )
 
-target_link_libraries(app
+target_link_libraries(app_boost_redis
   PRIVATE
     boost_redis_lib
 )
+
+install(TARGETS app_boost_redis)
 
 #==============================================================================
 add_executable(monitor)
