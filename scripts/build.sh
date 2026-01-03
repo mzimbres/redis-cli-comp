@@ -30,6 +30,7 @@ cd $apps/go-redis
 go get
 go build 
 cp app $prefix/bin/app_go_redis
+cd $root
 
 #--------------------------------------------
 # rueidis
@@ -38,25 +39,10 @@ cd $apps/rueidis
 go get
 go build 
 cp app $prefix/bin/app_rueidis
+cd $root
 
 #--------------------------------------------
 # fred-rs
 
 cargo install --path $apps/fred-rs --root $prefix
 
-# Benchmarks
-echo ""
-echo "Running benchamrks"
-echo "real user sys cpu"
-echo ""
-
-apps="boost_redis redis_rs go_redis rueidis"
-for app in $apps; do
-   echo "$app"
-   /usr/bin/time --format="%e %U %S %P" $prefix/bin/app_$app
-done
-
-#pidstat -v 1 -e ./app
-#pidstat -u 1 -e ./app
-#pidstat -w 1 -e ./app
-# perf stat
