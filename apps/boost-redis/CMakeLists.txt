@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8...4.0.2)
 
 project(boost-redis-app VERSION "1.0.0" LANGUAGES CXX)
 
-add_subdirectory(/home/marcelo/Public/boost boost-redis EXCLUDE_FROM_ALL)
+add_subdirectory(/home/marcelo/Public/boost tmp/boost-redis-bin  EXCLUDE_FROM_ALL)
 
 #==============================================================================
 add_library(boost_redis_lib STATIC EXCLUDE_FROM_ALL)
@@ -18,24 +18,29 @@ target_link_libraries(boost_redis_lib
 )
 
 #==============================================================================
-add_executable(app_boost_redis)
+function(add_app name)
+   add_executable(${name})
 
-target_compile_features(app_boost_redis
-   PRIVATE
-      cxx_std_20
-)
+   target_compile_features(${name}
+      PRIVATE
+         cxx_std_20
+   )
 
-target_sources(app_boost_redis
-  PRIVATE
-    main.cpp
-)
+   target_sources(${name}
+     PRIVATE
+       ${name}.cpp
+   )
 
-target_link_libraries(app_boost_redis
-  PRIVATE
-    boost_redis_lib
-)
+   target_link_libraries(${name}
+     PRIVATE
+       boost_redis_lib
+   )
 
-install(TARGETS app_boost_redis)
+   install(TARGETS ${name})
+endfunction()
+
+add_app(app_boost_redis)
+add_app(app_boost_redis_cb)
 
 #==============================================================================
 add_executable(monitor)

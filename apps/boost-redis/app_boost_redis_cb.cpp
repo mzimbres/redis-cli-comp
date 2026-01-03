@@ -1,0 +1,154 @@
+/* Copyright (c) 2018-2025 Marcelo Zimbres Silva (mzimbres@gmail.com)
+ *
+ * Distributed under the Boost Software License, Version 1.0. (See
+ * accompanying file LICENSE.txt)
+ */
+
+#include <boost/redis/connection.hpp>
+#include <boost/redis/logger.hpp>
+#include <boost/redis/config.hpp>
+#include <boost/redis/connection.hpp>
+
+#include <boost/asio/consign.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/asio/io_context.hpp>
+
+#include <iostream>
+
+// Parameters
+constexpr char const* channel = "channel";
+constexpr char const* payload = "payload";
+constexpr char const* uds = "/run/redis/redis-server.sock";
+constexpr std::size_t pings = 5;
+constexpr std::size_t sessions = 1000;
+constexpr std::size_t repeat = 10000;
+
+// Number of events expected 
+constexpr auto expected_pushes = 1 + sessions * repeat;
+
+// Number of responses expected 
+constexpr auto expected_resps = sessions * pings;
+
+namespace asio = boost::asio;
+using namespace std::chrono_literals;
+
+using boost::system::error_code;
+using boost::redis::request;
+using boost::redis::ignore;
+using boost::redis::ignore_t;
+using boost::redis::logger;
+using boost::redis::connection;
+using boost::redis::usage;
+using boost::redis::error;
+using boost::redis::config;
+using boost::redis::usage;
+
+std::ostream& operator<<(std::ostream& os, usage const& usg)
+{
+   os << "Number of commands sent: "                     << usg.commands_sent << "\n"
+      << "Number of bytes sent: "                        << usg.bytes_sent << "\n"
+      << "Number of responses received: "                << usg.responses_received << "\n"
+      << "Number of pushes received: "                   << usg.pushes_received << "\n"
+      << "Number of response-bytes received: "           << usg.response_bytes_received << "\n"
+      << "Number of push-bytes received: "               << usg.push_bytes_received << "\n"
+      << "Number of bytes rotated in the read buffer: "  << usg.bytes_rotated << "\n"
+   ;
+
+   return os;
+}
+
+void
+cb_session(
+   std::shared_ptr<connection> conn,
+   std::shared_ptr<const request> req,
+   std::size_t i)
+{
+   if (i++ == repeat)
+      return;
+
+   auto const cont = [conn, req, i](error_code ec, std::size_t)
+   {
+      if (ec) {
+         std::cerr << "cb_session (" << i << "): " << ec.message() << std::endl;
+         throw std::system_error(ec);
+      }
+
+      cb_session(conn, req, i);
+   };
+
+   conn->async_exec(*req, ignore, cont);
+}
+
+void cb_receive(std::shared_ptr<connection> conn)
+{
+   if (conn->get_usage().pushes_received >= expected_pushes) {
+      conn->cancel();
+      return;
+   }
+
+   auto const cont = [conn](error_code ec)
+   {
+      if (ec) {
+         std::cerr << "cb_receive: " << ec.message() << std::endl;
+         throw std::system_error(ec);
+      }
+
+      cb_receive(conn);
+   };
+
+   conn->async_receive2(cont);
+}
+
+std::shared_ptr<request> make_reqs()
+{
+   auto req = std::make_shared<request>();
+   for (std::size_t i = 0u; i < pings; ++i)
+      req->push("PING");
+
+   req->push("PUBLISH", channel, payload);
+   return req;
+}
+
+void cb_subscribe(std::shared_ptr<connection> conn)
+{
+   auto sub_req = std::make_shared<request>();
+   sub_req->push("SUBSCRIBE", channel);
+
+   auto cont = [conn, sub_req](error_code ec, std::size_t){
+      if (ec)
+         throw std::system_error(ec);
+
+      cb_receive(conn);
+
+      auto const session_req = make_reqs();
+      for (auto i = 0u; i < sessions; ++i)
+         cb_session(conn, session_req, 0);
+   };
+
+   conn->async_exec(*sub_req, ignore, cont);
+}
+
+int main()
+{
+   try {
+      asio::io_context ioc{BOOST_ASIO_CONCURRENCY_HINT_UNSAFE};
+      auto conn = std::make_shared<connection>(ioc);
+
+      config cfg;
+      cfg.unix_socket = uds;
+      conn->async_run(cfg, [](error_code){ });
+
+      cb_subscribe(conn);
+      ioc.run();
+
+      std::cout
+         << "Usage data\n"
+         << conn->get_usage()
+         << std::endl;
+
+   } catch (std::exception const& e) {
+      std::cerr << e.what() << std::endl;
+      return 1;
+   }
+}
