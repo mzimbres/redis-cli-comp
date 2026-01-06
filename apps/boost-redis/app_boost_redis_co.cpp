@@ -7,7 +7,6 @@
 #include <boost/redis/connection.hpp>
 #include <boost/redis/logger.hpp>
 #include <boost/redis/config.hpp>
-#include <boost/redis/connection.hpp>
 
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/consign.hpp>

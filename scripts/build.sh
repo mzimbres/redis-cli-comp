@@ -7,7 +7,7 @@ prefix=$root/tmp
 #--------------------------------------------
 # boost-redis
 
-boost_redis_builddir=$root/boost_redis
+boost_redis_builddir=$prefix/build-app-boost-redis
 mkdir -p $boost_redis_builddir
 cd $boost_redis_builddir
 cmake\

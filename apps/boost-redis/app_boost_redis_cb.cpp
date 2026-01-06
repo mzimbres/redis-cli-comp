@@ -7,7 +7,6 @@
 #include <boost/redis/connection.hpp>
 #include <boost/redis/logger.hpp>
 #include <boost/redis/config.hpp>
-#include <boost/redis/connection.hpp>
 
 #include <boost/asio/consign.hpp>
 #include <boost/asio/detached.hpp>
@@ -38,11 +37,13 @@ using boost::redis::request;
 using boost::redis::ignore;
 using boost::redis::ignore_t;
 using boost::redis::logger;
-using boost::redis::connection;
 using boost::redis::usage;
 using boost::redis::error;
 using boost::redis::config;
 using boost::redis::usage;
+
+using executor = asio::io_context::executor_type;
+using connection = boost::redis::basic_connection<executor>;
 
 std::ostream& operator<<(std::ostream& os, usage const& usg)
 {
