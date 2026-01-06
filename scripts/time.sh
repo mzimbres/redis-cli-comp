@@ -16,11 +16,35 @@ prefix=$(pwd)/tmp
 #   w   Number of times that the program was context-switched voluntarily, for instance while waiting for an I/O operation to complete.
 format="%e %S %U %P %M %R %c %w"
 
-apps="boost_redis_co boost_redis_cb redis_rs go_redis rueidis"
-file=time.txt
+#apps="boost_redis_co boost_redis_cb redis_rs go_redis rueidis"
+apps="boost_redis_co boost_redis_cb"
+file=tmp/time.txt
 echo "client $format"  > $file
 for app in $apps; do
    printf "%s " $app >> $file
    /usr/bin/time --append --output $file --format="$format" $prefix/bin/app_$app
-   sleep 5
+   sleep 1
+done
+
+for app in $apps; do
+   file=tmp/strace-$app.txt
+   rm -f $file
+   printf "%s " $app >> $file
+   strace --summary-only --output $file --summary-sort-by name $prefix/bin/app_$app
+   sleep 1
+done
+
+for app in $apps; do
+   file=tmp/pidstat-$app.txt
+   rm -f $file
+   pidstat -R 1 -e $prefix/bin/app_$app >> $file
+   sleep 1
+   pidstat -r 1 -e $prefix/bin/app_$app >> $file
+   sleep 1
+   pidstat -u 1 -e $prefix/bin/app_$app >> $file
+   sleep 1
+   pidstat -v 1 -e $prefix/bin/app_$app >> $file
+   sleep 1
+   pidstat -w 1 -e $prefix/bin/app_$app >> $file
+   sleep 1
 done
