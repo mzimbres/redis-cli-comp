@@ -20,7 +20,6 @@
 // Parameters
 constexpr char const* channel = "channel";
 constexpr char const* payload = "payload";
-constexpr char const* uds = "/run/redis/redis-server.sock";
 constexpr std::size_t pings = 5;
 constexpr std::size_t sessions = 1000;
 constexpr std::size_t repeat = 10000;
@@ -91,8 +90,6 @@ asio::awaitable<void> co_main(config cfg)
 {
    auto ex = co_await asio::this_coro::executor;
    auto conn = std::make_shared<connection>(ex);
-
-   cfg.unix_socket = uds;
    conn->async_run(cfg, asio::consign(asio::detached, conn));
 
    request sub_req;
@@ -119,7 +116,7 @@ int main()
 {
    try {
       config cfg;
-      asio::io_context ioc{BOOST_ASIO_CONCURRENCY_HINT_UNSAFE};
+      asio::io_context ioc{};
       asio::co_spawn(ioc, co_main(cfg), rethrow_on_error);
       ioc.run();
 

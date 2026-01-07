@@ -1,6 +1,8 @@
 #!/bin/bash
 
 prefix=$(pwd)/tmp
+datadir="$prefix/data"
+mkdir -p $datadir
 
 # See man 1 time
 #
@@ -17,8 +19,9 @@ prefix=$(pwd)/tmp
 format="%e %S %U %P %M %R %c %w"
 
 #apps="boost_redis_co boost_redis_cb redis_rs go_redis rueidis"
-apps="boost_redis_co boost_redis_cb"
-file=tmp/time.txt
+apps="boost_redis_co boost_redis_cb redis_rs go_redis"
+
+file=$datadir/time.txt
 echo "client $format"  > $file
 for app in $apps; do
    printf "%s " $app >> $file
@@ -27,7 +30,7 @@ for app in $apps; do
 done
 
 for app in $apps; do
-   file=tmp/strace-$app.txt
+   file=$datadir/strace-$app.txt
    rm -f $file
    printf "%s " $app >> $file
    strace --summary-only --output $file --summary-sort-by name $prefix/bin/app_$app
@@ -35,7 +38,7 @@ for app in $apps; do
 done
 
 for app in $apps; do
-   file=tmp/pidstat-$app.txt
+   file=$datadir/pidstat-$app.txt
    rm -f $file
    pidstat -R 1 -e $prefix/bin/app_$app >> $file
    sleep 1
@@ -46,5 +49,12 @@ for app in $apps; do
    pidstat -v 1 -e $prefix/bin/app_$app >> $file
    sleep 1
    pidstat -w 1 -e $prefix/bin/app_$app >> $file
+   sleep 1
+done
+
+for app in $apps; do
+   file=$datadir/perf-stat-$app.txt
+   rm -f $file
+   perf stat --output $file -e -- $prefix/bin/app_$app
    sleep 1
 done

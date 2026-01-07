@@ -18,7 +18,6 @@
 // Parameters
 constexpr char const* channel = "channel";
 constexpr char const* payload = "payload";
-constexpr char const* uds = "/run/redis/redis-server.sock";
 constexpr std::size_t pings = 5;
 constexpr std::size_t sessions = 1000;
 constexpr std::size_t repeat = 10000;
@@ -133,11 +132,10 @@ void cb_subscribe(std::shared_ptr<connection> conn)
 int main()
 {
    try {
-      asio::io_context ioc{BOOST_ASIO_CONCURRENCY_HINT_UNSAFE};
+      asio::io_context ioc;
       auto conn = std::make_shared<connection>(ioc);
 
       config cfg;
-      cfg.unix_socket = uds;
       conn->async_run(cfg, [](error_code){ });
 
       cb_subscribe(conn);

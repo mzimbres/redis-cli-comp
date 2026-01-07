@@ -9,10 +9,11 @@ import (
 
 const channel = "channel"
 const payload = "payload"
-const addr = "127.0.0.1:6379" // "/run/redis/redis-server.sock"
 const pings = 5
 const sessions = 1000
 const repeat = 10000
+
+const addr = "127.0.0.1:6379"
 
 // Number of expected events
 const expected_events = sessions * repeat;

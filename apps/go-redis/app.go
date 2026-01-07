@@ -10,7 +10,6 @@ import (
 // Parameters
 const channel = "channel"
 const payload = "payload"
-const uds = "/run/redis/redis-server.sock"
 const pings = 5
 const sessions = 1000
 const repeat = 10000
@@ -68,7 +67,7 @@ func main() {
 	fmt.Println("Number of events expected: ", expected_events)
 
 	ops := redis.Options{
-		Addr:     uds,
+		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 		Protocol: 3,
