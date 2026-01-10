@@ -112,7 +112,7 @@ redis-rs       |       9 |       10
 ## Cache and Branch misses
 
 Client         | cache-misses  | branch-misses
----------------|----------|----|-------------
+---------------|---------------|-------------
 boost-redis-co |   186,941,741 |   511,379,762
 boost-redis-cb |    91,815,535 |   264,195,103
 redis-rs       | 1,067,373,045 | 3,489,504,327
