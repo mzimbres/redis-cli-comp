@@ -67,7 +67,7 @@ The traffic generate by the parameters above reads
 
 Type      | Count | Bytes
 ----------|-------|--------
-Requests  | 60M   | 1.130Gb
+Requests  | 60M   | 1.130Mb
 Responses | 60M   |   390Mb
 Pushes    | 10M   |   430Mb
 

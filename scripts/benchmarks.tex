@@ -1,6 +1,6 @@
 \documentclass{article}
 \usepackage{pgfplots}
-\pgfrealjobname{echo}
+\pgfrealjobname{app}
 \pgfplotsset{compat=newest}
 
 \begin{document}
@@ -29,6 +29,22 @@
        (3.601,go-redis)
     };
   \end{axis}
+\end{tikzpicture}
+\endpgfgraphicnamed
+
+\beginpgfgraphicnamed{app-f1}
+\begin{tikzpicture}[scale=1.0]
+   \begin{axis}[
+         y dir=reverse,
+         xbar stacked,
+         bar width=20pt,
+         title={CPU (\%)},
+         symbolic y coords={boost-redis-co, boost-redis-cb, redis-rs, rueidis, go-redis},
+         xlabel={User $+$ System},
+      ]
+      \addplot[fill=orange!75, draw=orange!50!black] coordinates {(74.06,boost-redis-co) (50.48,boost-redis-cb) (207.31,redis-rs) (219.68,rueidis) (160.24,go-redis)};
+      \addplot[fill=orange!35, draw=orange!50!black] coordinates {( 3.68,boost-redis-co) ( 3.45,boost-redis-cb) ( 73.77,redis-rs) ( 60.00,rueidis) (104.15,go-redis)};
+   \end{axis}
 \end{tikzpicture}
 \endpgfgraphicnamed
 

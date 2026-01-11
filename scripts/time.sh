@@ -5,29 +5,24 @@ datadir="$prefix/data"
 rm -rf $datadir
 mkdir -p $datadir
 
-# See man 1 time
-#
-#   e   Elapsed real (wall clock) time used by the process, in seconds.
-#   M   Maximum resident set size of the process during its lifetime, in Kilobytes.
-#   R   Number of minor, or recoverable, page faults.  These are pages that are not valid (so they fault) but which have not yet been claimed by
-#       other virtual pages.  Thus the data in the page is still valid but the system tables must be updated.
-#   c   Number of times the process was context-switched involuntarily (because the time slice expired).
-#   w   Number of times that the program was context-switched voluntarily, for instance while waiting for an I/O operation to complete.
-format="%e %M %R"
-
 #apps="boost_redis_co boost_redis_cb redis_rs rueidis go_redis"
 #apps="boost_redis_co boost_redis_cb redis_rs go_redis"
-apps="rueidis"
+apps="boost_redis_co boost_redis_cb"
 
 echo "========================================================================="
-echo "time"
+echo "Bytes/s (sent)"
 echo ""
 
-file=$datadir/time.txt
-echo "client $format"  > $file
+sent=1130000000
+received=820000000
+
+file=$datadir/mb_per_sec_sent.txt
+echo "Client Mb/s(sent)"  > $file
 for app in $apps; do
-   printf "%s " $app >> $file
-   /usr/bin/time --append --output $file --format="$format" $prefix/bin/app_$app
+   /usr/bin/time --output=tmp.txt --format="%e" $prefix/bin/app_$app
+   t=$(cat tmp.txt)
+   value=$(bc -l <<< "$sent/($t * 1000000)")
+   printf "%s %.2f\n" $app $value >> $file
    sleep 1
 done
 
