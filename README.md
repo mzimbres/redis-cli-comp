@@ -79,35 +79,43 @@ push.
 
 ## Time
 
-Client         | real(s) | user(%) | sys(%)
----------------|---------|---------|-------
-boost-redis-co |  31.74  |   74.06 |   3.68
-boost-redis-cb |  30.63  |   50.48 |   3.45
-redis-rs       | 104.72  |  207.31 |  73.77
+Client         | real(s)
+---------------|--------
+boost-redis-co |  31.74 
+boost-redis-cb |  30.63 
+redis-rs       | 104.72 
+rueidis        |  65.10 
+go-redis       | 145.73 
 
 ## CPU
 
-Client         | CPU(%)
----------------|-------
-boost-redis-co |  77.74
-boost-redis-cb |  53.94
-redis-rs       | 281.08
-
-## Context switches
-
-Client         | Context switches/s
----------------|-------------------
-boost-redis-co |  1278.12
-boost-redis-cb |  1529.03
-redis-rs       | 89826.72
+Client         | user(%) | sys(%)
+---------------|---------|-------
+boost-redis-co |   74.06 |   3.68
+boost-redis-cb |   50.48 |   3.45
+redis-rs       |  207.31 |  73.77
+rueidis        |  219.68 |  60.00
+go-redis       |  160.24 | 104.15
 
 ## Threads
 
-Client         | threads | file descriptors
----------------|---------|------------------
-boost-redis-co |       2 |       7
-boost-redis-cb |       2 |       7
-redis-rs       |       9 |       10
+Client         | threads | fd-nr
+---------------|---------|-------
+boost-redis-co |       2 |    7
+boost-redis-cb |       2 |    7
+redis-rs       |       9 |   10
+rueidis        |      12 |    6
+go-redis       |      13 | 1001
+
+## Context switches
+
+Client         | context switches/s
+---------------|-------------------
+boost-redis-co |      1278.12
+boost-redis-cb |      1529.03
+redis-rs       |     89826.72
+rueidis        |      3882.10
+go-redis       |      3050.94
 
 ## Cache and Branch misses
 
@@ -116,18 +124,6 @@ Client         | cache-misses  | branch-misses
 boost-redis-co |   186,941,741 |   511,379,762
 boost-redis-cb |    91,815,535 |   264,195,103
 redis-rs       | 1,067,373,045 | 3,489,504,327
+rueidis        | 3,030,632,185 | 1,843,635,447
+go-redis       | 5,644,549,412 | 2,843,844,568
 
-## Conclusion
-
-The intrinsic performance difference of the languages used
-to implement the clients cannot account for the performance
-differece in the benchmarks.
-
-## TODO
-
-  - pidstat -w
-  - pidstat -v
-  - pidstat -u
-  - perf stat
-  - strace
-  - Article about how buffer rotations affect performance.
