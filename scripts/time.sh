@@ -6,22 +6,20 @@ rm -rf $datadir
 mkdir -p $datadir
 
 #apps="boost_redis_co boost_redis_cb redis_rs rueidis go_redis"
-#apps="boost_redis_co boost_redis_cb redis_rs go_redis"
-apps="boost_redis_co boost_redis_cb"
+apps="boost_redis_co boost_redis_cb redis_rs go_redis"
 
 echo "========================================================================="
-echo "Bytes/s (sent)"
+echo "Commands/s"
 echo ""
 
-sent=1130000000
-received=820000000
+cmds=60000002
 
 file=$datadir/mb_per_sec_sent.txt
-echo "Client Mb/s(sent)"  > $file
+echo "Client Commands/s"  > $file
 for app in $apps; do
    /usr/bin/time --output=tmp.txt --format="%e" $prefix/bin/app_$app
    t=$(cat tmp.txt)
-   value=$(bc -l <<< "$sent/($t * 1000000)")
+   value=$(bc -l <<< "$cmds/($t * 1000)")
    printf "%s %.2f\n" $app $value >> $file
    sleep 1
 done
