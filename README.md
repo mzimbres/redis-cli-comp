@@ -9,9 +9,9 @@ Clients on the other end must be capable of using the server
 efficiently for the performance of the system as a whole to
 be great.
 
-In this article we profiled the performance of the most
-popular clients by simulating the scenario where Redis is
-mostly used, namely, on internet facing servers (mostly
+In this article we profiled the performance of some of the
+most popular clients by simulating the scenario where Redis
+is mostly used, namely, internet facing servers (usually
 HTTP) that serve connections concurrently while receiving
 server pushes e.g. pubsub events. The benchmark consists of
 
@@ -21,14 +21,14 @@ server pushes e.g. pubsub events. The benchmark consists of
 
 The steps above were implemented with the following clients
 
-Client      | UIA     | Stars   | Contributors | Age   | Lnaguage 
-------------|---------|---------|--------------|-------|---------
-boost-redis |      64 |     270 |           14 |     6 | C++
-go-redis    |    1090 |   21800 |          400 |    13 | Go
-rueidis     |     174 |    2900 |          132 |     5 | Go
-redis-rs    |     495 |    4100 |          261 |    12 | Rust
-redis++     |     327 |    1900 |           44 |     8 | C++
-fred-rs*    |      94 |     505 |            1 |     4 | Rust
+Client                                                | UIA     | Stars   | Contributors | Age   | Lnaguage 
+------------------------------------------------------|---------|---------|--------------|------|---------
+[boost-redis](https://github.com/boostorg/redis)      |      64 |     270 |           14 |     6 | C++
+[go-redis](https://github.com/redis/go-redis)         |    1090 |   21800 |          400 |    13 | Go
+[rueidis](https://github.com/redis/rueidis)           |     174 |    2900 |          132 |     5 | Go
+[redis-rs](https://github.com/redis-rs/redis-rs)      |     495 |    4100 |          261 |    12 | Rust
+[redis++](https://github.com/sewenew/redis-plus-plus) |     327 |    1900 |           44 |     8 | C++
+[fred-rs](https://github.com/aembke/fred.rs)*         |      94 |     505 |            1 |     4 | Rust
 
 Where UIA stands for _Unique Issue Authors_
 
