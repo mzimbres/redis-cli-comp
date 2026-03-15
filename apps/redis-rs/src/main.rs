@@ -32,7 +32,7 @@ async fn session(mut con: MultiplexedConnection, cmds: Arc<redis::Pipeline>) -> 
     Ok(())
 }
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
     let client = redis::Client::open(ADDR).unwrap();
 

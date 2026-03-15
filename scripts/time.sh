@@ -6,95 +6,86 @@ rm -rf $datadir
 mkdir -p $datadir
 
 #apps="boost_redis_co boost_redis_cb redis_rs rueidis go_redis"
-apps="boost_redis_co boost_redis_cb redis_rs go_redis"
+apps="boost_redis_cb redis_rs"
 
-echo "========================================================================="
-echo "Commands/s"
-echo ""
+#------------------------------------------------------------
+# Define the files
 
-cmds=60000002
+timefile=$datadir/time.txt
+psu_file=$datadir/pidstat-u.txt
+psv_file=$datadir/pidstat-v.txt
+psw_file=$datadir/pidstat-w.txt
+psr_file=$datadir/pidstat-r.txt
+perfs_file=$datadir/perf-stat.txt
 
-file=$datadir/mb_per_sec_sent.txt
-echo "Client Commands/s"  > $file
+#------------------------------------------------------------
+# Write the headers
+
+echo "Client Commands/s"  > $timefile
+echo "Type UID PID %usr %system %guest %wait %CPU CPU Command" > $psu_file
+echo "Type UID PID threads fd-nr Command" > $psv_file
+echo "Type UID PID cswch/s nvcswch/s Command" > $psw_file
+echo "Type UID PID minflt/s majflt/s VSZ RSS %MEM Command" > $psr_file
+echo "client cache-misses branch-misses" > $perfs_file
+
+#------------------------------------------------------------
+
 for app in $apps; do
-   /usr/bin/time --output=tmp.txt --format="%e" $prefix/bin/app_$app
-   t=$(cat tmp.txt)
-   value=$(bc -l <<< "$cmds/($t * 1000)")
-   printf "%s %.2f\n" $app $value >> $file
+   echo "$app"
+   echo "========================================================================="
+   echo "Time"
+   echo ""
+
+   /usr/bin/time --output=$timefile --append --format="%e" $prefix/bin/app_$app
    sleep 1
-done
 
-column --table $file
+   echo "========================================================================="
+   echo "pidstat -u"
+   echo ""
 
-echo "========================================================================="
-echo "pidstat -u"
-echo ""
-
-file=$datadir/pidstat-u.txt
-echo "Type UID PID %usr %system %guest %wait %CPU CPU Command" > $file
-for app in $apps; do
-   pidstat -u 1 -e $prefix/bin/app_$app | grep '^Average' >> $file
+   pidstat -u 1 -e $prefix/bin/app_$app | grep '^Average' >> $psu_file
    sleep 1
-done
 
-column --table $file
+   echo "========================================================================="
+   echo "pidstat -v"
+   echo ""
 
-echo "========================================================================="
-echo "pidstat -v"
-echo ""
-
-file=$datadir/pidstat-v.txt
-echo "Type UID PID threads fd-nr Command" > $file
-for app in $apps; do
-   pidstat -v 1 -e $prefix/bin/app_$app | grep '^Average' >> $file
+   pidstat -v 1 -e $prefix/bin/app_$app | grep '^Average' >> $psv_file
    sleep 1
-done
 
-column --table $file
+   echo "========================================================================="
+   echo "pidstat -w"
+   echo ""
 
-echo "========================================================================="
-echo "pidstat -w"
-echo ""
-
-file=$datadir/pidstat-w.txt
-echo "Type UID PID cswch/s nvcswch/s Command" > $file
-for app in $apps; do
-   pidstat -w 1 -e $prefix/bin/app_$app | grep '^Average' >> $file
+   pidstat -w 1 -e $prefix/bin/app_$app | grep '^Average' >> $psw_file
    sleep 1
-done
 
-column --table $file
+   echo "========================================================================="
+   echo "pidstat -r"
+   echo ""
 
-echo "========================================================================="
-echo "pidstat -r"
-echo ""
-
-file=$datadir/pidstat-r.txt
-echo "Type UID PID minflt/s majflt/s VSZ RSS %MEM Command" > $file
-for app in $apps; do
-   pidstat -r 1 -e $prefix/bin/app_$app | grep '^Average' >> $file
+   pidstat -r 1 -e $prefix/bin/app_$app | grep '^Average' >> $psr_file
    sleep 1
-done
 
-column --table $file
+   echo "========================================================================="
+   echo "perf-stat"
+   echo ""
 
-echo "========================================================================="
-echo "perf-stat"
-echo ""
-
-perf_res=$datadir/perf-stat.txt
-echo "client cache-misses branch-misses" > $perf_res
-for app in $apps; do
    file=$datadir/perf-stat-$app.txt
    rm -f $file
    perf stat -B -e branch-misses,cache-misses --output $file -- $prefix/bin/app_$app
    cache_misses=$(grep cache-misses $file | awk '{print $1}')
    branch_misses=$(grep branch-misses $file | awk '{print $1}')
-   echo "$app $cache_misses $branch_misses" >> $perf_res
+   echo "$app $cache_misses $branch_misses" >> $perfs_file
    sleep 1
 done
 
-column --table $perf_res
+column --table $timefile
+column --table $psu_file
+column --table $psv_file
+column --table $psw_file
+column --table $psr_file
+column --table $perfs_file
 
 #echo "========================================================================="
 #echo "strace"

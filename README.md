@@ -1,25 +1,25 @@
 # Redis client comparison
 
-Redis most advertized selling point is performance. As an
+_Performance_ is Redis most advertized selling point. As an
 _in-memory_ database it promises low-latency solutions for
-typical backend needs: caching, queuing, rate limiting etc.
+backend typical needs: caching, queuing, rate limiting etc.
 
-The Redis server however is only one side of the equation.
-Clients on the other end must be capable of using the server
+The Redis server however is only one side of the equation,
+clients on the other end must be capable of using the server
 efficiently for the performance of the system as a whole to
 be great.
 
 In this article we profiled the performance of some of the
 most popular clients by simulating the scenario where Redis
-is mostly used, namely, internet facing servers (usually
-HTTP) that serve connections concurrently while receiving
-server pushes e.g. pubsub events. The benchmark consists of
+is mostly used: internet facing servers (usually HTTP) that
+serve connections concurrently while receiving server pushes
+e.g. pubsub events. The benchmark consists of
 
   1. starting multiple sessions that issue commands in a loop.
 
   2. subscribing to a channel to receive pubsub events.
 
-The steps above were implemented with the following clients
+The following clients have been considered
 
 Client                                                | UIA     | Stars   | Contributors | Age   | Lnaguage 
 ------------------------------------------------------|---------|---------|--------------|------|---------
@@ -30,7 +30,7 @@ Client                                                | UIA     | Stars   | Cont
 [redis++](https://github.com/sewenew/redis-plus-plus) |     327 |    1900 |           44 |     8 | C++
 [fred-rs](https://github.com/aembke/fred.rs)*         |      94 |     505 |            1 |     4 | Rust
 
-Where UIA stands for _Unique Issue Authors_
+Where UIA refers to the unique number of github issue (_Unique Issue Authors_)
 
 * The `fred-rs` benchmark was aborted due to apparent bug or
   misuse of the library, which is being clarified in
@@ -89,3 +89,19 @@ redis-rs       | 1,067,373,045 | 3,489,504,327
 rueidis        | 3,030,632,185 | 1,843,635,447
 go-redis       | 5,644,549,412 | 2,843,844,568
 
+## Ergonomics
+
+
+
+### Creating and executing a request
+
+- Boost.Redi
+
+```cpp
+   request req;
+   req.push("SUBSCRIBE", channel);
+```
+
+```rust
+cmds.exec_async(&mut con).await?;
+```
