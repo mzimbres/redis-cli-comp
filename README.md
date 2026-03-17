@@ -1,7 +1,7 @@
 # Redis client comparison
 
 _Performance_ is Redis most advertized selling point. As an
-_in-memory_ database it promises low-latency solutions for
+_in-memory_ database it provides low-latency solutions for
 backend typical needs: caching, queuing, rate limiting etc.
 
 The Redis server however is only one side of the equation,
@@ -30,7 +30,8 @@ Client                                                | UIA     | Stars   | Cont
 [redis++](https://github.com/sewenew/redis-plus-plus) |     327 |    1900 |           44 |     8 | C++
 [fred-rs](https://github.com/aembke/fred.rs)*         |      94 |     505 |            1 |     4 | Rust
 
-Where UIA refers to the unique number of github issue (_Unique Issue Authors_)
+Where the abbreviation UIA used above refers to the unique number of
+github issue authors (_Unique Issue Authors_)
 
 * The `fred-rs` benchmark was aborted due to apparent bug or
   misuse of the library, which is being clarified in
@@ -39,17 +40,26 @@ Where UIA refers to the unique number of github issue (_Unique Issue Authors_)
 
 ## Results
 
-### Throughput
+The parameters used in the simulation result in the following number
+of requests, responses and pushes
 
-client         | commands/s
----------------|--------
-boost-redis-co | 2054.79
-boost-redis-cb | 1533.74
-redis-rs       |  559.60
+Type        | Counter | Bytes (Mb)
+------------|---------|-----------
+Requests    |   60M   | 1130
+Responses   |   60M   |  390
+Pushes      |   10M   |  430
+
+### Time
+
+Client         | Time (s)
+---------------|---------
+boost-redis-co | 
+boost-redis-cb | 25.58
+redis-rs       | 43.30
 rueidis        |  
-go-redis       |  399.49
+go-redis       |  
 
-## CPU
+### CPU
 
 Client         | user(%) | sys(%)
 ---------------|---------|-------
@@ -59,7 +69,7 @@ redis-rs       |  207.31 |  73.77
 rueidis        |  219.68 |  60.00
 go-redis       |  160.24 | 104.15
 
-## Threads
+### Threads
 
 Client         | threads | fd-nr
 ---------------|---------|-------
@@ -69,7 +79,7 @@ redis-rs       |       9 |   10
 rueidis        |      12 |    6
 go-redis       |      13 | 1001
 
-## Context switches
+### Context switches
 
 Client         | context switches/s
 ---------------|-------------------
@@ -79,7 +89,7 @@ redis-rs       |     89826.72
 rueidis        |      3882.10
 go-redis       |      3050.94
 
-## Cache and Branch misses
+### Cache and Branch misses
 
 Client         | cache-misses  | branch-misses
 ---------------|---------------|-------------
@@ -89,19 +99,3 @@ redis-rs       | 1,067,373,045 | 3,489,504,327
 rueidis        | 3,030,632,185 | 1,843,635,447
 go-redis       | 5,644,549,412 | 2,843,844,568
 
-## Ergonomics
-
-
-
-### Creating and executing a request
-
-- Boost.Redi
-
-```cpp
-   request req;
-   req.push("SUBSCRIBE", channel);
-```
-
-```rust
-cmds.exec_async(&mut con).await?;
-```

@@ -5,13 +5,11 @@
  */
 
 #include <boost/redis/connection.hpp>
-#include <boost/redis/logger.hpp>
 #include <boost/redis/config.hpp>
 
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/consign.hpp>
 #include <boost/asio/detached.hpp>
-#include <boost/asio/error.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/use_awaitable.hpp>
 
@@ -35,15 +33,9 @@ using namespace std::chrono_literals;
 
 using boost::system::error_code;
 using boost::redis::request;
-using boost::redis::resp3::flat_tree;
-using boost::redis::ignore;
-using boost::redis::ignore_t;
-using boost::redis::logger;
 using boost::redis::connection;
 using boost::redis::usage;
-using boost::redis::error;
 using boost::redis::config;
-using boost::redis::usage;
 
 std::ostream& operator<<(std::ostream& os, usage const& usg)
 {
@@ -59,31 +51,11 @@ std::ostream& operator<<(std::ostream& os, usage const& usg)
    return os;
 }
 
-asio::awaitable<void>
-co_session(
-   std::shared_ptr<connection> conn,
-   std::shared_ptr<const request> req)
-{
-   for (auto i = 0u; i < repeat; ++i) {
-      co_await conn->async_exec(*req);
-   }
-}
-
 void rethrow_on_error(std::exception_ptr p)
 {
    if (p) {
       std::rethrow_exception(p);
    }
-}
-
-std::shared_ptr<request> make_reqs()
-{
-   auto req = std::make_shared<request>();
-   for (std::size_t i = 0u; i < pings; ++i)
-      req->push("PING");
-
-   req->push("PUBLISH", channel, payload);
-   return req;
 }
 
 asio::awaitable<void> co_main(config cfg)
@@ -96,20 +68,27 @@ asio::awaitable<void> co_main(config cfg)
    sub_req.push("SUBSCRIBE", channel);
    co_await conn->async_exec(sub_req);
 
-   auto const session_req = make_reqs();
-   for (auto i = 0u; i < sessions; ++i)
-      asio::co_spawn(ex, co_session(conn, session_req), rethrow_on_error);
+   auto session_req = std::make_shared<request>();
+   for (std::size_t i = 0u; i < pings; ++i)
+      session_req->push("PING");
+
+   session_req->push("PUBLISH", channel, payload);
+
+   for (auto i = 0u; i < sessions; ++i) {
+      auto const session = [conn, session_req]() -> asio::awaitable<void> {
+         for (auto i = 0u; i < repeat; ++i) {
+            co_await conn->async_exec(*session_req);
+         }
+      };
+      asio::co_spawn(ex, session, rethrow_on_error);
+   }
 
    while (conn->get_usage().pushes_received < expected_pushes) {
       co_await conn->async_receive2();
    }
 
    conn->cancel();
-
-   std::cout
-      << "Usage data\n"
-      << conn->get_usage()
-      << std::endl;
+   std::cout << "Usage data\n" << conn->get_usage() << std::endl;
 }
 
 int main()
