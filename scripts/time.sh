@@ -6,7 +6,7 @@ rm -rf $datadir
 mkdir -p $datadir
 
 #apps="boost_redis_co boost_redis_cb redis_rs rueidis go_redis"
-apps="boost_redis_cb redis_rs"
+apps="boost_redis_co"
 
 #------------------------------------------------------------
 # Define the files
