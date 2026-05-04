@@ -28,3 +28,25 @@ endfunction()
 
 add_app(app_boost_redis_co)
 add_app(app_boost_redis_cb)
+
+#------------------------------------------------------------------------------
+
+add_executable(app_boost_redis_corosio)
+
+target_compile_features(app_boost_redis_corosio
+  PRIVATE
+     cxx_std_20
+)
+
+target_sources(app_boost_redis_corosio
+ PRIVATE
+   app_boost_redis_corosio.cpp
+   boost_redis_corosio.cpp
+)
+
+target_link_libraries(app_boost_redis_corosio
+ PRIVATE
+    Boost::redis_corosio
+)
+
+install(TARGETS app_boost_redis_corosio)
