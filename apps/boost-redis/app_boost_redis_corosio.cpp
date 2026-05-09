@@ -33,21 +33,39 @@ namespace capy = boost::capy;
 using namespace boost::redis;
 namespace corosio = boost::corosio;
 
-capy::io_task<> run_request(co_connection& conn)
+capy::io_task<> run_request(std::shared_ptr<co_connection> conn)
 {
-   // A request containing only a ping command.
-   request req;
-   req.push("PING", "Hello world");
+   auto ex = co_await capy::this_coro::executor;
 
-   // Response where the PONG response will be stored.
-   response<std::string> resp;
-
-   // Executes the request.
-   auto [ec] = co_await conn.exec(req, resp);
+   request sub_req;
+   sub_req.push("SUBSCRIBE", channel);
+   auto [ec] = co_await conn->exec(sub_req);
    if (ec) {
-      std::cout << "Error executing PING: " << ec << std::endl;
-   } else {
-      std::cout << "PING value: " << std::get<0>(resp).value() << std::endl;
+      std::cout << "SUBSCRIBE error: " << ec << std::endl;
+      exit(-1); // TODO: Exit cleanly.
+   }
+
+   auto session_req = std::make_shared<request>();
+   for (std::size_t i = 0u; i < pings; ++i)
+      session_req->push("PING");
+
+   session_req->push("PUBLISH", channel, payload);
+
+   for (auto i = 0u; i < sessions; ++i) {
+      auto const session = [conn, session_req]() -> capy::task<> {
+         for (auto i = 0u; i < repeat; ++i) {
+            auto [ec] = co_await conn->exec(*session_req);
+               if (ec) {
+                  std::cout << "SUBSCRIBE error: " << ec << std::endl;
+                  exit(-1); // TODO: Exit cleanly.
+               }
+         }
+      };
+      capy::run_async(ex)(session());
+   }
+
+   while (conn->get_usage().pushes_received < expected_pushes) {
+      co_await conn->receive();
    }
 
    co_return {};
@@ -55,11 +73,9 @@ capy::io_task<> run_request(co_connection& conn)
 
 capy::task<void> co_main()
 {
-   // Create a connection
-   co_connection conn{co_await capy::this_coro::executor};
-
-   // Run the connection and the PING request, in parallel
-   co_await capy::when_any(run_request(conn), conn.run(config{}));
+   auto ex = co_await capy::this_coro::executor;
+   auto conn = std::make_shared<co_connection>(ex);
+   co_await capy::when_any(run_request(conn), conn->run(config{}));
 }
 
 int main()

@@ -5,8 +5,8 @@ datadir="$prefix/data"
 rm -rf $datadir
 mkdir -p $datadir
 
-#apps="boost_redis_co boost_redis_cb redis_rs rueidis go_redis"
-apps="boost_redis_co"
+#apps="boost_redis_asio_co boost_redis_asio_cb redis_rs rueidis go_redis"
+apps="boost_redis_asio_co boost_redis_asio_cb boost_redis_corosio redis_rs go_redis"
 
 #------------------------------------------------------------
 # Define the files

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8...4.0.2)
 
 project(boost-redis-app VERSION "1.0.0" LANGUAGES CXX)
 
-add_subdirectory(/home/marcelo/Public/boost tmp/build-boost-redis EXCLUDE_FROM_ALL)
+add_subdirectory($ENV{HOME}/Public/boost tmp/build-boost-redis EXCLUDE_FROM_ALL)
 
 function(add_app name)
    add_executable(${name})
@@ -26,8 +26,8 @@ function(add_app name)
    install(TARGETS ${name})
 endfunction()
 
-add_app(app_boost_redis_co)
-add_app(app_boost_redis_cb)
+add_app(app_boost_redis_asio_co)
+add_app(app_boost_redis_asio_cb)
 
 #------------------------------------------------------------------------------
 
