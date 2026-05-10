@@ -51,56 +51,60 @@ Pushes      |   10M   |  430
 
 ### Time
 
-Client              | Time (s)
+Client              | Time (s/s)
 --------------------|---------
-boost-redis-asio-co | 
-boost-redis-asio-cb | 25.58
-boost-redis-corosio |      
-redis-rs            | 43.30
-rueidis             |  
-go-redis            |  
+boost-redis-asio-co |  2.2
+boost-redis-asio-cb |  1.3
+boost-redis-corosio |  1   
+redis-rs            |  4.7
+rueidis             |  -
+go-redis            | 27.6
+
+The table above provide the times normalized to the fastest client which was
+boost-redis running on corosio.  The value has been computed by multiplying the
+wall time with the percentage of CPU usage by the client.
 
 ### CPU
 
 Client              | user(%) | sys(%)
 --------------------|---------|-------
-boost-redis-asio-co |   74.06 |   3.68
-boost-redis-asio-cb |   50.48 |   3.45
-boost-redis-corosio |         |       
-redis-rs            |  207.31 |  73.77
-rueidis             |  219.68 |  60.00
-go-redis            |  160.24 | 104.15
+boost-redis-asio-co |   65.0  |    3.3
+boost-redis-asio-cb |   46.2  |    2.8
+boost-redis-corosio |   32.5  |    6.2
+redis-rs            |   98.2  |    1.6
+rueidis             |    -    |     -     
+go-redis            |  174.0  |  105.1
 
 ### Threads
 
 Client              | threads | fd-nr
 --------------------|---------|-------
-boost-redis-asio-co |       2 |    7
-boost-redis-asio-cb |       2 |    7
-boost-redis-corosio |         |     
-redis-rs            |       9 |   10
-rueidis             |      12 |    6
-go-redis            |      13 | 1001
+boost-redis-asio-co |    2    |    7
+boost-redis-asio-cb |    2    |    7
+boost-redis-corosio |    3    |    7
+redis-rs            |    1    |   10
+rueidis             |    -    |    -
+go-redis            |   24    | 1006
 
 ### Context switches
 
 Client              | context switches/s
 --------------------|-------------------
-boost-redis-asio-co |      1278.12
-boost-redis-asio-cb |      1529.03
-boost-redis-corosio |             
-redis-rs            |     89826.72
-rueidis             |      3882.10
-go-redis            |      3050.94
+boost-redis-asio-co |   2733.56
+boost-redis-asio-cb |   2861.21
+boost-redis-corosio |   3325.44
+redis-rs            |     25.85
+rueidis             |          
+go-redis            |   3113.71
 
 ### Cache and Branch misses
 
 Client              | cache-misses  | branch-misses
 --------------------|---------------|-------------
-boost-redis-asio-co |   186,941,741 |   511,379,762
-boost-redis-asio-cb |    91,815,535 |   264,195,103
-boost-redis-corosio |               |              
-redis-rs            | 1,067,373,045 | 3,489,504,327
-rueidis             | 3,030,632,185 | 1,843,635,447
-go-redis            | 5,644,549,412 | 2,843,844,568
+boost-redis-asio-co |    16,808,299 |    84,612,336             
+boost-redis-asio-cb |     6,979,958 |    56,653,319             
+boost-redis-corosio |    19,369,915 |    75,381,092             
+redis-rs            |       736,951 |   302,865,130             
+rueidis             |          -    |      -                    
+go-redis            | 1,216,462,587 | 1,666,424,709             
 
