@@ -5,7 +5,7 @@ const PAYLOAD: &str = "payload";
 const POOL_SIZE: usize = 256;
 const PINGS: usize = 5;
 const SESSIONS: usize = 1000;
-const REPEAT: usize = 1000;
+const REPEAT: usize = 30000;
 
 // Number of events expected 
 const EXPECTED_PUSHES: usize = SESSIONS * REPEAT;

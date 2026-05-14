@@ -21,12 +21,12 @@ perfs_file=$datadir/perf-stat.txt
 #------------------------------------------------------------
 # Write the headers
 
-echo "Client Commands/s"  > $timefile
-echo "Type UID PID %usr %system %guest %wait %CPU CPU Command" > $psu_file
-echo "Type UID PID threads fd-nr Command" > $psv_file
-echo "Type UID PID cswch/s nvcswch/s Command" > $psw_file
-echo "Type UID PID minflt/s majflt/s VSZ RSS %MEM Command" > $psr_file
-echo "client cache-misses branch-misses" > $perfs_file
+echo "# Wall-clock"  > $timefile
+echo "# Type UID PID %usr %system %guest %wait %CPU CPU Command" > $psu_file
+echo "# Type UID PID threads fd-nr Command" > $psv_file
+echo "# Type UID PID cswch/s nvcswch/s Command" > $psw_file
+echo "# Type UID PID minflt/s majflt/s VSZ RSS %MEM Command" > $psr_file
+echo "# client cache-misses branch-misses" > $perfs_file
 
 #------------------------------------------------------------
 

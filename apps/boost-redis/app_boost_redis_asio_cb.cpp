@@ -20,7 +20,7 @@ constexpr char const* channel = "channel";
 constexpr char const* payload = "payload";
 constexpr std::size_t pings = 5;
 constexpr std::size_t sessions = 1000;
-constexpr std::size_t repeat = 10000;
+constexpr std::size_t repeat = 30000;
 
 // Number of events expected 
 constexpr auto expected_pushes = 1 + sessions * repeat;

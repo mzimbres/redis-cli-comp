@@ -12,7 +12,7 @@ const channel = "channel"
 const payload = "payload"
 const pings = 5
 const sessions = 1000
-const repeat = 10000
+const repeat = 30000
 
 // Number of expected events
 const expected_events = sessions * repeat;
