@@ -21,7 +21,7 @@ constexpr char const* channel = "channel";
 constexpr char const* payload = "payload";
 constexpr std::size_t pings = 5;
 constexpr std::size_t sessions = 1000;
-constexpr std::size_t repeat = 30000;
+constexpr std::size_t repeat = 900000;
 
 // Number of events expected 
 constexpr auto expected_pushes = 1 + sessions * repeat;
@@ -63,25 +63,46 @@ using boost::redis::config;
 // Response-bytes received
 // Push-bytes received
 // Bytes rotated
+// Execs
+// Coalesced
 // Socket reads
 // Socket writes
 // Time reading
 // Time writing
 
+std::ostream& format(std::ostream& os, std::size_t v)
+{
+   if (v >= 1'000'000) {
+     os << v / 1'000'000 << "M";
+     return os;
+   }
+
+   if (v >= 1'000) {
+     os << v / 1'000 << "K";
+     return os;
+   }
+
+   os << v;
+   return os;
+}
+
 std::ostream& operator<<(std::ostream& os, usage const& u)
 {
-   os << u.commands_sent << ":"
-      << u.bytes_sent << ":"
-      << u.responses_received << ":"
-      << u.pushes_received << ":"
-      << u.response_bytes_received << ":"
-      << u.push_bytes_received << ":"
-      << u.bytes_rotated << ":"
-      << u.socket_reads << ":"
-      << u.socket_writes << ":"
-      << std::chrono::duration_cast<std::chrono::milliseconds>(u.time_reading) << ":"
-      << std::chrono::duration_cast<std::chrono::milliseconds>(u.time_writing)
-   ;
+   auto const time_reading = std::chrono::duration_cast<std::chrono::milliseconds>(u.time_reading);
+   auto const time_writing = std::chrono::duration_cast<std::chrono::milliseconds>(u.time_writing);
+   format(os, u.commands_sent)           << ":";
+   format(os, u.bytes_sent)              << ":";
+   format(os, u.responses_received)      << ":";
+   format(os, u.pushes_received)         << ":";
+   format(os, u.response_bytes_received) << ":";
+   format(os, u.push_bytes_received)     << ":";
+   format(os, u.bytes_rotated)           << ":";
+   format(os, u.execs)                   << ":";
+   format(os, u.coalesced)               << ":";
+   format(os, u.socket_reads)            << ":";
+   format(os, u.socket_writes)           << ":";
+   os << time_reading                    << ":";
+   os << time_writing                    << ":";
 
    return os;
 }
@@ -107,6 +128,8 @@ usage make_diff(usage const& a, usage const& b)
    ret.socket_writes           =  b.socket_writes           - a.socket_writes;
    ret.time_reading            =  b.time_reading            - a.time_reading;
    ret.time_writing            =  b.time_writing            - a.time_writing;
+   ret.execs                   =  b.execs                   - a.execs;
+   ret.coalesced               =  b.coalesced               - a.coalesced;
 
    return ret;
 }
