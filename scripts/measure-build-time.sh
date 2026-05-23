@@ -2,7 +2,6 @@
 
 root=$(pwd)
 srcdir=$root/apps/boost-redis
-prefix=
 builddir=$root/tmp/build-app-boost-redis
 
 #------------------------------------------------------------------------------
@@ -31,4 +30,8 @@ for app in $apps; do
   touch $srcdir/$app.cpp
   /usr/bin/time --format="%e" cmake --build $builddir --target $app
 done
+
+printf "%s " app_redis_rs
+touch apps/redis-rs/src/main.rs
+/usr/bin/time --format="%e" cargo build --jobs 1 --quiet --manifest-path apps/redis-rs/Cargo.toml
 

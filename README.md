@@ -22,7 +22,7 @@ e.g. pubsub events. The benchmark consists of
 The following clients have been considered
 
 Client                                                | UIA     | Stars   | Contributors | Age   | Lnaguage 
-------------------------------------------------------|---------|---------|--------------|------|---------
+------------------------------------------------------|---------|---------|--------------|-------|---------
 [boost-redis](https://github.com/boostorg/redis)      |      64 |     270 |           14 |     6 | C++
 [go-redis](https://github.com/redis/go-redis)         |    1090 |   21800 |          400 |    13 | Go
 [rueidis](https://github.com/redis/rueidis)           |     174 |    2900 |          132 |     5 | Go

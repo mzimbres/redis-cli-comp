@@ -4,49 +4,32 @@ project(boost-redis-app VERSION "1.0.0" LANGUAGES CXX)
 
 add_subdirectory($ENV{HOME}/Public/boost tmp/build-boost-redis EXCLUDE_FROM_ALL)
 
-function(add_app name)
-   add_executable(${name})
+add_library(Boost::redis_asio ALIAS boost_redis)
 
-   target_compile_features(${name}
+function(add_app name flavor)
+   set(app app_boost_redis_${name})
+   add_executable(${app})
+
+   target_compile_features(${app}
       PRIVATE
          cxx_std_20
    )
 
-   target_sources(${name}
+   target_sources(${app}
      PRIVATE
-       ${name}.cpp
-       boost_redis_lib_asio.cpp
+       ${app}.cpp
+       boost_redis_lib_${flavor}.cpp
    )
 
-   target_link_libraries(${name}
+   target_link_libraries(${app}
      PRIVATE
-        Boost::redis
+        Boost::redis_${flavor}
    )
 
-   install(TARGETS ${name})
+   install(TARGETS ${app})
 endfunction()
 
-add_app(app_boost_redis_asio_co)
-add_app(app_boost_redis_asio_cb)
+add_app(asio_co asio)
+add_app(asio_cb asio)
+add_app(corosio corosio)
 
-#------------------------------------------------------------------------------
-
-add_executable(app_boost_redis_corosio)
-
-target_compile_features(app_boost_redis_corosio
-  PRIVATE
-     cxx_std_20
-)
-
-target_sources(app_boost_redis_corosio
- PRIVATE
-   app_boost_redis_corosio.cpp
-   boost_redis_lib_corosio.cpp
-)
-
-target_link_libraries(app_boost_redis_corosio
- PRIVATE
-    Boost::redis_corosio
-)
-
-install(TARGETS app_boost_redis_corosio)
