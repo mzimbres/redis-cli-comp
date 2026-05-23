@@ -15,7 +15,7 @@ function(add_app name)
    target_sources(${name}
      PRIVATE
        ${name}.cpp
-       boost_redis_lib.cpp
+       boost_redis_lib_asio.cpp
    )
 
    target_link_libraries(${name}
@@ -41,7 +41,7 @@ target_compile_features(app_boost_redis_corosio
 target_sources(app_boost_redis_corosio
  PRIVATE
    app_boost_redis_corosio.cpp
-   boost_redis_corosio.cpp
+   boost_redis_lib_corosio.cpp
 )
 
 target_link_libraries(app_boost_redis_corosio

@@ -4,4 +4,5 @@
  * accompanying file LICENSE.txt)
  */
 
-#include <boost/redis/src.hpp>
+#include <boost/redis/src/asio.hpp>
+#include <boost/redis/src/proto.hpp>

@@ -7,7 +7,7 @@ prefix=$root/tmp
 #--------------------------------------------
 # boost-redis
 
-./scripts/build_boost_redis.sh
+./scripts/build-boost-redis.sh
 
 #--------------------------------------------
 # redis-rs
