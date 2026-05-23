@@ -15,6 +15,8 @@ cmake\
   -B $boost_redis_builddir\
   -DCMAKE_INSTALL_PREFIX=$prefix\
   -DBOOST_REDIS_COROSIO_API=ON\
+  -DCMAKE_TARGET_MESSAGES=OFF\
+  -DCMAKE_RULE_MESSAGES=OFF\
   -DCMAKE_BUILD_TYPE=Release
 
 cmake --build $boost_redis_builddir --target install -j3
