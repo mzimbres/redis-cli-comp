@@ -1,1 +1,3 @@
 tmp
+apps/redis-rs/target
+apps/fred-rs/target

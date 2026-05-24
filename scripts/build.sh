@@ -12,7 +12,7 @@ prefix=$root/tmp
 #--------------------------------------------
 # redis-rs
 
-cargo install --path $apps/redis-rs --root $prefix
+./scripts/build-redis-rs.sh
 
 #--------------------------------------------
 # go-redis
