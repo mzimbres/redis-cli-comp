@@ -8,8 +8,4 @@ fi
 app=$1
 dir=apps/$app
 go get -C $dir
-go build -C $dir
-cp $dir/app tmp/bin/app_$app
-
-# go install does not allow renaming apps
-# GOBIN=$(pwd)/bin go install -C $dir
+/usr/bin/time --format="%e" go build -C $dir -o tmp/bin/app_$app

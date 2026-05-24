@@ -38,7 +38,7 @@ github issue authors (_Unique Issue Authors_)
   [this](https://github.com/aembke/fred.rs/issues/367)
   issue.
 
-## Results
+## Performance Results
 
 The parameters used in the simulation result in the following number
 of requests, responses and pushes
@@ -108,3 +108,27 @@ redis-rs            |       736,951 |   302,865,130
 rueidis             |          -    |      -                    
 go-redis            | 1,216,462,587 | 1,666,424,709             
 
+## Build time Results
+
+### App build time
+
+Time needed to build the app with one core after touching the implementation
+file 
+
+Client              | Time
+--------------------|--------------
+boost-redis-asio-co | 3.59
+boost-redis-asio-cb | 8.95
+boost-redis-corosio | 1.80
+redis-rs            | 0.16
+fred-rs             | 0.19
+go-redis            | 0.04
+rueidis             | 0.04
+
+### Client build time
+
+Time needed to build the client with one core after touching the implementation
+file 
+
+Client              | Time
+--------------------|--------------

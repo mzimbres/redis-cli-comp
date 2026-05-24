@@ -15,6 +15,10 @@ printf "%s " redis_rs
 touch apps/redis-rs/src/main.rs
 /usr/bin/time --format="%e" cargo build --jobs 1 --quiet --manifest-path apps/redis-rs/Cargo.toml
 
+printf "%s " fred-rs
+touch apps/fred-rs/src/main.rs
+/usr/bin/time --format="%e" cargo build --jobs 1 --quiet --manifest-path apps/fred-rs/Cargo.toml
+
 printf "%s " go_redis
 touch apps/go_redis/app.go
 /usr/bin/time --format="%e" go build -C apps/go_redis -p 1
