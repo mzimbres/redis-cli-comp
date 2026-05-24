@@ -110,25 +110,37 @@ go-redis            | 1,216,462,587 | 1,666,424,709
 
 ## Build time Results
 
+Time needed to build the client with one core after touching the implementation
+file 
+
+### Total build time
+
+Client                  | Time(s)
+------------------------|------
+redis-rs                | 42.6
+fred-rs                 | 63.7
+
 ### App build time
 
 Time needed to build the app with one core after touching the implementation
 file 
 
-Client              | Time
+Client              | Time(s)
 --------------------|--------------
-boost-redis-asio-co | 3.59
-boost-redis-asio-cb | 8.95
-boost-redis-corosio | 1.80
-redis-rs            | 0.16
-fred-rs             | 0.19
-go-redis            | 0.04
-rueidis             | 0.04
+boost-redis-asio-co |  3.6
+boost-redis-asio-cb |  9.0
+boost-redis-corosio |  1.8
+redis-rs            |  3.2
+fred-rs             | 12.8
 
 ### Client build time
 
 Time needed to build the client with one core after touching the implementation
 file 
 
-Client              | Time
---------------------|--------------
+Client                  | Time(s)
+------------------------|------
+boost-redis-lib-asio    |  21.7
+boost-redis-lib-corosio |   5.3
+redis-rs                |   9.6
+fred-rs                 |  18.7
