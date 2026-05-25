@@ -126,9 +126,6 @@ rueidis             |  0.28
 
 ### Client build time
 
-Time needed to build the client with one core after touching the implementation
-file 
-
 Client                  | Time(s)
 ------------------------|------
 boost-redis-lib-asio    |  21.7
