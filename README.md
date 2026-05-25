@@ -132,13 +132,20 @@ boost-redis-lib-asio    |  21.7
 boost-redis-lib-corosio |   5.3
 redis-rs                |   9.6
 fred-rs                 |  18.7
+go-redis                |   -
+rueidis                 |   -
+
+NOTE: I haven't found a way to build only the client excluding the app in go.
 
 ### Total build time
 
 Client                  | Time(s)
 ------------------------|------
+boost-redis-asio-co     | 35.5
+boost-redis-asio-cb     | 40.5
 boost-redis-corosio     | 33.6
 redis-rs                | 42.6
 fred-rs                 | 63.7
 go-redis                |  9.0
+rueidis                 |  9.5
 
