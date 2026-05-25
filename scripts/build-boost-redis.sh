@@ -19,4 +19,4 @@ cmake\
   -DCMAKE_RULE_MESSAGES=OFF\
   -DCMAKE_BUILD_TYPE=Release
 
-cmake --build $boost_redis_builddir --target install -j3
+cmake --build $boost_redis_builddir --target install

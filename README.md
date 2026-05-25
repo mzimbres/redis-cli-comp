@@ -110,22 +110,19 @@ go-redis            | 1,216,462,587 | 1,666,424,709
 
 ## Build time
 
-Time needed to build different configuration with one process e.g. `make -j1`.
+Time needed to build different configuration using only one process e.g. `make -j1`.
 
 ### App build time
 
 Client              | Time(s)
 --------------------|--------------
-boost-redis-asio-co |  3.6
-boost-redis-asio-cb |  9.0
-boost-redis-corosio |  1.8
-redis-rs            |  3.2
-fred-rs             | 12.8
-
-Methodology
-
-  - `boost-redis`: Time measure by touching the implementation file and running the build.
-  - Rust clients: `cargo build` was run with the `--timings` option.
+boost-redis-asio-co |  3.60
+boost-redis-asio-cb |  8.62
+boost-redis-corosio |  1.68
+redis-rs            |  3.10
+fred-rs             | 12.80
+go-redis            |  0.28
+rueidis             |  0.28
 
 ### Client build time
 
@@ -143,6 +140,7 @@ fred-rs                 |  18.7
 
 Client                  | Time(s)
 ------------------------|------
+boost-redis-corosio     | 33.6
 redis-rs                | 42.6
 fred-rs                 | 63.7
 go-redis                |  9.0
