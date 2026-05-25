@@ -38,7 +38,7 @@ github issue authors (_Unique Issue Authors_)
   [this](https://github.com/aembke/fred.rs/issues/367)
   issue.
 
-## Performance Results
+## Performance
 
 The parameters used in the simulation result in the following number
 of requests, responses and pushes
@@ -108,22 +108,11 @@ redis-rs            |       736,951 |   302,865,130
 rueidis             |          -    |      -                    
 go-redis            | 1,216,462,587 | 1,666,424,709             
 
-## Build time Results
+## Build time
 
-Time needed to build the client with one core after touching the implementation
-file 
-
-### Total build time
-
-Client                  | Time(s)
-------------------------|------
-redis-rs                | 42.6
-fred-rs                 | 63.7
+Time needed to build different configuration with one process e.g. `make -j1`.
 
 ### App build time
-
-Time needed to build the app with one core after touching the implementation
-file 
 
 Client              | Time(s)
 --------------------|--------------
@@ -132,6 +121,11 @@ boost-redis-asio-cb |  9.0
 boost-redis-corosio |  1.8
 redis-rs            |  3.2
 fred-rs             | 12.8
+
+Methodology
+
+  - `boost-redis`: Time measure by touching the implementation file and running the build.
+  - Rust clients: `cargo build` was run with the `--timings` option.
 
 ### Client build time
 
@@ -144,3 +138,12 @@ boost-redis-lib-asio    |  21.7
 boost-redis-lib-corosio |   5.3
 redis-rs                |   9.6
 fred-rs                 |  18.7
+
+### Total build time
+
+Client                  | Time(s)
+------------------------|------
+redis-rs                | 42.6
+fred-rs                 | 63.7
+go-redis                |  9.0
+

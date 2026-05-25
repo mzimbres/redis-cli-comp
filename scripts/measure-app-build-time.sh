@@ -21,9 +21,9 @@ touch apps/fred-rs/src/main.rs
 
 printf "%s " go_redis
 touch apps/go_redis/app.go
-/usr/bin/time --format="%e" go build -C apps/go_redis -p 1
+/usr/bin/time --format="%e" go build -C apps/go_redis -buildvcs=false -p 1
 
 printf "%s " rueidis
 touch apps/rueidis/app.go
-/usr/bin/time --format="%e" go build -C apps/rueidis -p 1
+/usr/bin/time --format="%e" go build -C apps/rueidis -buildvcs=false -p 1
 
