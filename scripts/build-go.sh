@@ -9,4 +9,4 @@ app=$1
 dir=apps/$app
 go get -C $dir
 go clean -cache
-/usr/bin/time --format="%e" go build -C $dir -buildvcs=false -a -p 1 -o tmp/bin/app_$app
+/usr/bin/time --format="%e" go build -C $dir -buildvcs=false -a -p 1 -o $PWD/tmp/bin/app_$app
